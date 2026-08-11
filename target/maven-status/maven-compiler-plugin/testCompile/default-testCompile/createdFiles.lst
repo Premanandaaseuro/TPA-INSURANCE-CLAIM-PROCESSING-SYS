@@ -1,8 +1,0 @@
-com\tpa\claimprocessor\controller\ClaimControllerIntegrationTest.class
-com\tpa\claimprocessor\rules\RuleEngineAuditTest$RuleCombinationsAndPriority.class
-com\tpa\claimprocessor\service\ClaimServiceTest.class
-com\tpa\claimprocessor\extraction\DocumentProcessingPipelineTest.class
-com\tpa\claimprocessor\rules\RuleEngineAuditTest$IndividualRuleAudits.class
-com\tpa\claimprocessor\rules\RuleEngineAuditTest.class
-com\tpa\claimprocessor\export\PdfExportServiceTest.class
-com\tpa\claimprocessor\util\PdfFixtureGenerator.class
