@@ -161,8 +161,9 @@ public class ClaimServiceImpl implements ClaimService {
         // 10. Store JSON Extracted Payload
         try {
             String jsonPayload = objectMapper.writeValueAsString(extractedData);
-            ClaimJson claimJson = new ClaimJson(jsonPayload);
+            ClaimJson claimJson = new ClaimJson(claim, jsonPayload);
             claim.setClaimJson(claimJson);
+
         } catch (JsonProcessingException e) {
             log.error("Failed to serialize extracted data to JSON for claim {}", claimId, e);
         }

@@ -76,17 +76,15 @@ public class Claim {
     @OneToMany(mappedBy = "claim", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     private List<ClaimRuleResult> ruleResults = new ArrayList<>();
 
-    @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
-    @JoinColumn(name = "discharge_details_id")
+    @OneToOne(mappedBy = "claim", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     private DischargeDetails dischargeDetails;
 
-    @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
-    @JoinColumn(name = "hospital_bill_details_id")
+    @OneToOne(mappedBy = "claim", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     private HospitalBillDetails hospitalBillDetails;
 
-    @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
-    @JoinColumn(name = "claim_json_id")
+    @OneToOne(mappedBy = "claim", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     private ClaimJson claimJson;
+
 
     public Claim() {
         this.createdAt = LocalDateTime.now();
@@ -269,6 +267,9 @@ public class Claim {
 
     public void setDischargeDetails(DischargeDetails dischargeDetails) {
         this.dischargeDetails = dischargeDetails;
+        if (dischargeDetails != null) {
+            dischargeDetails.setClaim(this);
+        }
     }
 
     public HospitalBillDetails getHospitalBillDetails() {
@@ -277,6 +278,9 @@ public class Claim {
 
     public void setHospitalBillDetails(HospitalBillDetails hospitalBillDetails) {
         this.hospitalBillDetails = hospitalBillDetails;
+        if (hospitalBillDetails != null) {
+            hospitalBillDetails.setClaim(this);
+        }
     }
 
     public ClaimJson getClaimJson() {
@@ -285,5 +289,8 @@ public class Claim {
 
     public void setClaimJson(ClaimJson claimJson) {
         this.claimJson = claimJson;
+        if (claimJson != null) {
+            claimJson.setClaim(this);
+        }
     }
 }

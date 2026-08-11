@@ -4,18 +4,19 @@
 CREATE TABLE IF NOT EXISTS policies (
     id BIGSERIAL PRIMARY KEY,
     policy_id VARCHAR(100) UNIQUE,
-    policy_number VARCHAR(100) UNIQUE,
+    policy_number VARCHAR(100) NOT NULL UNIQUE,
     customer_name VARCHAR(255),
     carrier_name VARCHAR(255),
     policy_name VARCHAR(255),
     start_date DATE,
     end_date DATE,
-    status VARCHAR(50),
+    sum_insured NUMERIC(15, 2),
     max_coverage_amount NUMERIC(15, 2),
     co_pay_percentage NUMERIC(5, 2),
     deductible_amount NUMERIC(15, 2),
     room_rent_capping_per_day NUMERIC(15, 2),
     icu_rent_capping_per_day NUMERIC(15, 2),
+    status VARCHAR(50),
     created_at TIMESTAMP
 );
 
@@ -77,6 +78,8 @@ CREATE TABLE IF NOT EXISTS hospital_bill_details (
     claim_id BIGINT UNIQUE REFERENCES claims(id) ON DELETE CASCADE,
     bill_number VARCHAR(100),
     bill_date DATE,
+    hospital_name VARCHAR(255),
+    patient_name VARCHAR(255),
     room_rent_charges NUMERIC(15, 2),
     icu_charges NUMERIC(15, 2),
     doctor_fee NUMERIC(15, 2),
@@ -98,10 +101,9 @@ CREATE TABLE IF NOT EXISTS claim_rule_results (
 );
 
 -- 7. Claim JSON Table
-CREATE TABLE IF NOT EXISTS claim_json (
+CREATE TABLE IF NOT EXISTS claim_jsons (
     id BIGSERIAL PRIMARY KEY,
     claim_id BIGINT UNIQUE REFERENCES claims(id) ON DELETE CASCADE,
-    raw_extracted_text TEXT,
-    extracted_json TEXT,
-    created_at TIMESTAMP NOT NULL
+    extracted_payload TEXT,
+    created_at TIMESTAMP
 );

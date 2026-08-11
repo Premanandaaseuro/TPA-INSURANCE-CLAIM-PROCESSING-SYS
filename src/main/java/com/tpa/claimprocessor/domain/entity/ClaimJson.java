@@ -11,6 +11,10 @@ public class ClaimJson {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "claim_id")
+    private Claim claim;
+
     @Column(name = "extracted_payload", columnDefinition = "TEXT")
     private String extractedPayload;
 
@@ -21,7 +25,8 @@ public class ClaimJson {
         this.createdAt = LocalDateTime.now();
     }
 
-    public ClaimJson(String extractedPayload) {
+    public ClaimJson(Claim claim, String extractedPayload) {
+        this.claim = claim;
         this.extractedPayload = extractedPayload;
         this.createdAt = LocalDateTime.now();
     }
@@ -32,6 +37,14 @@ public class ClaimJson {
 
     public void setId(Long id) {
         this.id = id;
+    }
+
+    public Claim getClaim() {
+        return claim;
+    }
+
+    public void setClaim(Claim claim) {
+        this.claim = claim;
     }
 
     public String getExtractedPayload() {

@@ -11,6 +11,10 @@ public class DischargeDetails {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "claim_id")
+    private Claim claim;
+
     @Column(name = "patient_name")
     private String patientName;
 
@@ -23,11 +27,17 @@ public class DischargeDetails {
     @Column(name = "discharge_date")
     private LocalDate dischargeDate;
 
-    @Column(name = "primary_diagnosis", length = 1000)
+    @Column(name = "diagnosis", length = 1000)
     private String primaryDiagnosis;
+
+    @Column(name = "treatment_given", columnDefinition = "TEXT")
+    private String treatmentGiven;
 
     @Column(name = "treating_doctor")
     private String treatingDoctor;
+
+    @Column(name = "room_type")
+    private String roomType;
 
     public DischargeDetails() {
     }
@@ -38,6 +48,14 @@ public class DischargeDetails {
 
     public void setId(Long id) {
         this.id = id;
+    }
+
+    public Claim getClaim() {
+        return claim;
+    }
+
+    public void setClaim(Claim claim) {
+        this.claim = claim;
     }
 
     public String getPatientName() {
@@ -80,11 +98,27 @@ public class DischargeDetails {
         this.primaryDiagnosis = primaryDiagnosis;
     }
 
+    public String getTreatmentGiven() {
+        return treatmentGiven;
+    }
+
+    public void setTreatmentGiven(String treatmentGiven) {
+        this.treatmentGiven = treatmentGiven;
+    }
+
     public String getTreatingDoctor() {
         return treatingDoctor;
     }
 
     public void setTreatingDoctor(String treatingDoctor) {
         this.treatingDoctor = treatingDoctor;
+    }
+
+    public String getRoomType() {
+        return roomType;
+    }
+
+    public void setRoomType(String roomType) {
+        this.roomType = roomType;
     }
 }

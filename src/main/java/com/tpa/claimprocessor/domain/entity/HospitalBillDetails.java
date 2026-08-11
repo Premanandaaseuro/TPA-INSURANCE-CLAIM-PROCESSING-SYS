@@ -12,6 +12,10 @@ public class HospitalBillDetails {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "claim_id")
+    private Claim claim;
+
     @Column(name = "bill_number")
     private String billNumber;
 
@@ -24,17 +28,23 @@ public class HospitalBillDetails {
     @Column(name = "patient_name")
     private String patientName;
 
-    @Column(name = "total_amount", precision = 15, scale = 2)
-    private BigDecimal totalAmount;
+    @Column(name = "room_rent_charges", precision = 15, scale = 2)
+    private BigDecimal roomRentCharges;
 
-    @Column(name = "room_charges", precision = 15, scale = 2)
-    private BigDecimal roomCharges;
+    @Column(name = "icu_charges", precision = 15, scale = 2)
+    private BigDecimal icuCharges;
 
-    @Column(name = "pharmacy_charges", precision = 15, scale = 2)
-    private BigDecimal pharmacyCharges;
+    @Column(name = "doctor_fee", precision = 15, scale = 2)
+    private BigDecimal doctorFee;
 
-    @Column(name = "consultation_charges", precision = 15, scale = 2)
-    private BigDecimal consultationCharges;
+    @Column(name = "medicine_charges", precision = 15, scale = 2)
+    private BigDecimal medicineCharges;
+
+    @Column(name = "investigation_charges", precision = 15, scale = 2)
+    private BigDecimal investigationCharges;
+
+    @Column(name = "total_bill_amount", precision = 15, scale = 2)
+    private BigDecimal totalBillAmount;
 
     public HospitalBillDetails() {
     }
@@ -45,6 +55,14 @@ public class HospitalBillDetails {
 
     public void setId(Long id) {
         this.id = id;
+    }
+
+    public Claim getClaim() {
+        return claim;
+    }
+
+    public void setClaim(Claim claim) {
+        this.claim = claim;
     }
 
     public String getBillNumber() {
@@ -79,35 +97,83 @@ public class HospitalBillDetails {
         this.patientName = patientName;
     }
 
+    public BigDecimal getRoomRentCharges() {
+        return roomRentCharges;
+    }
+
+    public void setRoomRentCharges(BigDecimal roomRentCharges) {
+        this.roomRentCharges = roomRentCharges;
+    }
+
+    public BigDecimal getIcuCharges() {
+        return icuCharges;
+    }
+
+    public void setIcuCharges(BigDecimal icuCharges) {
+        this.icuCharges = icuCharges;
+    }
+
+    public BigDecimal getDoctorFee() {
+        return doctorFee;
+    }
+
+    public void setDoctorFee(BigDecimal doctorFee) {
+        this.doctorFee = doctorFee;
+    }
+
+    public BigDecimal getMedicineCharges() {
+        return medicineCharges;
+    }
+
+    public void setMedicineCharges(BigDecimal medicineCharges) {
+        this.medicineCharges = medicineCharges;
+    }
+
+    public BigDecimal getInvestigationCharges() {
+        return investigationCharges;
+    }
+
+    public void setInvestigationCharges(BigDecimal investigationCharges) {
+        this.investigationCharges = investigationCharges;
+    }
+
+    public BigDecimal getTotalBillAmount() {
+        return totalBillAmount;
+    }
+
+    public void setTotalBillAmount(BigDecimal totalBillAmount) {
+        this.totalBillAmount = totalBillAmount;
+    }
+
     public BigDecimal getTotalAmount() {
-        return totalAmount;
+        return totalBillAmount;
     }
 
     public void setTotalAmount(BigDecimal totalAmount) {
-        this.totalAmount = totalAmount;
+        this.totalBillAmount = totalAmount;
     }
 
     public BigDecimal getRoomCharges() {
-        return roomCharges;
+        return roomRentCharges;
     }
 
     public void setRoomCharges(BigDecimal roomCharges) {
-        this.roomCharges = roomCharges;
+        this.roomRentCharges = roomCharges;
     }
 
     public BigDecimal getPharmacyCharges() {
-        return pharmacyCharges;
+        return medicineCharges;
     }
 
     public void setPharmacyCharges(BigDecimal pharmacyCharges) {
-        this.pharmacyCharges = pharmacyCharges;
+        this.medicineCharges = pharmacyCharges;
     }
 
     public BigDecimal getConsultationCharges() {
-        return consultationCharges;
+        return doctorFee;
     }
 
     public void setConsultationCharges(BigDecimal consultationCharges) {
-        this.consultationCharges = consultationCharges;
+        this.doctorFee = consultationCharges;
     }
 }
