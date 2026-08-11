@@ -4,15 +4,15 @@ services:
     container_name: tpa_postgres
     restart: always
     environment:
-      POSTGRES_DB: ${DB_NAME:-tpa_claims_db}
-      POSTGRES_USER: ${DB_USERNAME:-postgres}
-      POSTGRES_PASSWORD: ${DB_PASSWORD:-postgres}
+      POSTGRES_DB: ${DB_NAME:-tpa_claim_db}
+      POSTGRES_USER: ${DB_USERNAME:-tpa_user}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-tpa_password}
     ports:
       - "${HOST_DB_PORT:-7003}:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${DB_USERNAME:-postgres} -d ${DB_NAME:-tpa_claims_db}"]
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USERNAME:-tpa_user} -d ${DB_NAME:-tpa_claim_db}"]
       interval: 5s
       timeout: 5s
       retries: 5
@@ -32,9 +32,9 @@ services:
       SERVER_PORT: 7002
       DB_HOST: postgres
       DB_PORT: 5432
-      DB_NAME: ${DB_NAME:-tpa_claims_db}
-      DB_USERNAME: ${DB_USERNAME:-postgres}
-      DB_PASSWORD: ${DB_PASSWORD:-postgres}
+      DB_NAME: ${DB_NAME:-tpa_claim_db}
+      DB_USERNAME: ${DB_USERNAME:-tpa_user}
+      DB_PASSWORD: ${DB_PASSWORD:-tpa_password}
       UPLOAD_DIR: ${UPLOAD_DIR:-storage/claims}
     volumes:
       - claim_storage:/app/storage/claims

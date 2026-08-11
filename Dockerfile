@@ -4,13 +4,9 @@
 FROM maven:3.9.6-eclipse-temurin-21 AS builder
 WORKDIR /app
 
-# Copy pom.xml and download dependencies
+# Copy pom.xml and Java source code
 COPY pom.xml .
-RUN mvn dependency:go-offline -B
-
-# Copy static frontend resources (if built) and Java source code
 COPY src ./src
-COPY frontend ./frontend
 
 # Build executable JAR skipping tests (tests ran in CI)
 RUN mvn clean package -DskipTests
@@ -35,9 +31,9 @@ EXPOSE 7002
 ENV SERVER_PORT=7002 \
     DB_HOST=postgres \
     DB_PORT=5432 \
-    DB_NAME=tpa_claims_db \
-    DB_USERNAME=postgres \
-    DB_PASSWORD=postgres \
+    DB_NAME=tpa_claim_db \
+    DB_USERNAME=tpa_user \
+    DB_PASSWORD=tpa_password \
     UPLOAD_DIR=storage/claims
 
 # Run Spring Boot application

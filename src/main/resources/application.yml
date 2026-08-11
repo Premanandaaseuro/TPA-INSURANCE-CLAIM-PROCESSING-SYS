@@ -3,14 +3,19 @@ spring:
     name: tpa-claim-processor
 
   datasource:
-    url: ${DB_URL:jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:7003}/${DB_NAME:tpa_claims_db}}
-    username: ${DB_USERNAME:postgres}
-    password: ${DB_PASSWORD:postgres}
+    url: ${DB_URL:jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:7003}/${DB_NAME:tpa_claim_db}}
+    username: ${DB_USERNAME:tpa_user}
+    password: ${DB_PASSWORD:tpa_password}
     driver-class-name: org.postgresql.Driver
+
+  flyway:
+    enabled: true
+    baseline-on-migrate: true
+    locations: classpath:db/migration
 
   jpa:
     hibernate:
-      ddl-auto: update
+      ddl-auto: validate
     show-sql: false
     properties:
       hibernate:

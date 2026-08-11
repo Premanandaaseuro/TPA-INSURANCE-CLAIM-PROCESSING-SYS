@@ -1,6 +1,6 @@
 # TPA Health Insurance Claim Processing System
 
-Production-grade, modular monolith system for automated health insurance claim ingestion, OCR & text extraction, business rule validation, decision adjudication, and PDF report export.
+Production-grade, modular monolith system for automated health insurance claim ingestion, OCR & text extraction, Flyway schema migrations, business rule validation, decision adjudication, and PDF report export.
 
 ---
 
@@ -9,14 +9,44 @@ Production-grade, modular monolith system for automated health insurance claim i
 > [!IMPORTANT]
 > **Ports 3000 and 8080 are intentionally NOT used anywhere in this system** because those ports are reserved by existing applications (e.g., Jenkins on 8080).
 
-| Service | Dedicated Host Port | Internal Container Port | Access URL |
+| Service | Dedicated Host Port | Internal Container Port | Access URL / Connection String |
 |---|---|---|---|
 | **Frontend SPA** | `7001` | `7001` | [http://localhost:7001](http://localhost:7001) |
 | **Backend REST API** | `7002` | `7002` | [http://localhost:7002](http://localhost:7002) |
-| **PostgreSQL Database** | `7003` | `5432` | `localhost:7003` |
+| **PostgreSQL Database** | `7003` | `5432` | `localhost:7003` (`tpa_claim_db`) |
 
-### **Why PostgreSQL Host Port is 7003:**
-Host port `7003` is mapped to internal container port `5432` (`7003:5432`) to prevent port conflicts with local PostgreSQL instances or existing host services. Inside the Docker network, the backend container connects directly to `postgres:5432`.
+---
+
+## 🐘 Local pgAdmin Connection Settings
+
+To inspect or manage the database from your **Local Windows pgAdmin**:
+
+| Setting Key | Parameter Value |
+|---|---|
+| **Host Name / Address** | `localhost` |
+| **Port** | `7003` |
+| **Maintenance Database** | `tpa_claim_db` |
+| **Username** | `tpa_user` |
+| **Password** | `tpa_password` (configured in `.env`) |
+
+### **Connection Routing Explanation:**
+- **Local Host Access (pgAdmin / Host Apps):** Connects to `localhost:7003` via Docker port mapping (`7003:5432`). Host port `5432` is intentionally NOT exposed to prevent conflicts with local PostgreSQL installations.
+- **Docker Network Access (Spring Boot inside Docker):** Connects directly to container hostname `postgres:5432`:
+  `jdbc:postgresql://postgres:5432/tpa_claim_db`
+
+---
+
+## 🗄️ Database Flyway Migrations (`db/migration/V1__init_schema.sql`)
+
+Automated database schema migrations are managed via **Flyway**. On application launch, Flyway executes `V1__init_schema.sql` creating the following 7 core tables:
+
+1. **`policies`**: Policy master data, coverage caps, and copay rates.
+2. **`claims`**: Core claim records, patient details, and decision statuses.
+3. **`claim_documents`**: Ingested document metadata, paths, and SHA-256 checksums.
+4. **`discharge_details`**: Hospitalization dates, diagnosis, and doctor details.
+5. **`hospital_bill_details`**: Room rent, ICU fee, doctor fee, and total bill amounts.
+6. **`claim_rule_results`**: Deterministic 10-rule evaluation audit log (`R01`-`R10`).
+7. **`claim_json`**: Extracted text payloads and full JSON representation.
 
 ---
 
@@ -24,7 +54,7 @@ Host port `7003` is mapped to internal container port `5432` (`7003:5432`) to pr
 
 ### Option 1: Run with Docker Compose (Recommended)
 
-1. **Clone & Environment Setup:**
+1. **Environment Setup:**
    ```bash
    cp .env.example .env
    ```
@@ -35,15 +65,15 @@ Host port `7003` is mapped to internal container port `5432` (`7003:5432`) to pr
    docker compose up -d
    ```
 
-3. **Verify Container Status:**
+3. **Verify Container & Database Health:**
    ```bash
    docker compose ps
    ```
 
 4. **Access Applications:**
    - **Frontend Dashboard:** [http://localhost:7001](http://localhost:7001)
-   - **Backend API:** [http://localhost:7002/api/claims](http://localhost:7002/api/claims)
-   - **PostgreSQL Database:** `localhost:7003` (`tpa_claims_db`)
+   - **Backend REST API:** [http://localhost:7002/api/claims](http://localhost:7002/api/claims)
+   - **pgAdmin / Database:** `localhost:7003` (`tpa_claim_db`, user: `tpa_user`, pass: `tpa_password`)
 
 5. **Stop Containers:**
    ```bash
@@ -58,11 +88,14 @@ Host port `7003` is mapped to internal container port `5432` (`7003:5432`) to pr
 - Java 21 LTS
 - Maven 3.9+
 - Node.js 20+
-- PostgreSQL listening on `localhost:7003` (or H2 test profile)
+- PostgreSQL database listening on `localhost:7003` (or H2 test profile)
 
 #### 1. Backend Application (Port 7002)
 ```bash
-# Build standalone executable JAR
+# Run unit & rule engine tests (uses H2 in-memory scope)
+mvn clean test
+
+# Package standalone executable JAR
 mvn clean package
 
 # Run Spring Boot backend
