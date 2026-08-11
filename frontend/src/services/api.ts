@@ -1,6 +1,6 @@
 import { ClaimResponseDto } from '../types/claim';
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8081/api/claims';
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:7002/api/claims';
 
 export async function fetchClaims(): Promise<ClaimResponseDto[]> {
   const response = await fetch(API_BASE_URL);

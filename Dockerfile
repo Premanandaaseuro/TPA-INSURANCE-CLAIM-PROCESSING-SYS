@@ -20,7 +20,7 @@ FROM eclipse-temurin:21-jre-alpine
 WORKDIR /app
 
 # Install Tesseract OCR package for Alpine runtime
-RUN apk add --no-co-cache tesseract-ocr tesseract-ocr-data-eng
+RUN apk add --no-cache tesseract-ocr tesseract-ocr-data-eng
 
 # Create storage directory for claims
 RUN mkdir -p storage/claims
@@ -28,11 +28,11 @@ RUN mkdir -p storage/claims
 # Copy packaged JAR from builder stage
 COPY --from=builder /app/target/tpa-claim-processor-1.0.0-SNAPSHOT.jar app.jar
 
-# Expose backend port 8081
-EXPOSE 8081
+# Expose backend port 7002
+EXPOSE 7002
 
 # Set default environment variables
-ENV SERVER_PORT=8081 \
+ENV SERVER_PORT=7002 \
     DB_HOST=postgres \
     DB_PORT=5432 \
     DB_NAME=tpa_claims_db \

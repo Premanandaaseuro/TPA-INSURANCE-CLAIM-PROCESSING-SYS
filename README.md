@@ -4,29 +4,19 @@ Production-grade, modular monolith system for automated health insurance claim i
 
 ---
 
-## 📌 Architecture & Technology Stack
-
-- **Backend:** Java 21 LTS, Spring Boot 3.4.3 / 3.5, Spring Web, Spring Data JPA, Hibernate, Jackson, Bean Validation
-- **Database:** PostgreSQL 17
-- **Extraction Engine:** Apache PDFBox 3.0.3 + Tess4J / Tesseract OCR
-- **Frontend:** React 18, Vite 6, TypeScript 5, Tailwind CSS 3, Lucide React
-- **Containerization:** Multi-stage Docker & Docker Compose
-
----
-
-## ⚡ Important Infrastructure & Port Notice
+## 📌 Architecture & Dedicated Port Allocation
 
 > [!IMPORTANT]
-> **Port 8080 is intentionally NOT used anywhere in this system** because port 8080 is reserved by local infrastructure (such as Jenkins).
+> **Ports 3000 and 8080 are intentionally NOT used anywhere in this system** because those ports are reserved by existing applications (e.g., Jenkins on 8080).
 
-| Service | Host Port | Internal Container Port | Access URL |
+| Service | Dedicated Host Port | Internal Container Port | Access URL |
 |---|---|---|---|
-| **Frontend SPA** | `3000` | `3000` | [http://localhost:3000](http://localhost:3000) |
-| **Backend REST API** | `8081` | `8081` | [http://localhost:8081](http://localhost:8081) |
-| **PostgreSQL Database** | `5433` | `5432` | `localhost:5433` |
+| **Frontend SPA** | `7001` | `7001` | [http://localhost:7001](http://localhost:7001) |
+| **Backend REST API** | `7002` | `7002` | [http://localhost:7002](http://localhost:7002) |
+| **PostgreSQL Database** | `7003` | `5432` | `localhost:7003` |
 
-### **Why PostgreSQL Host Port is 5433:**
-Host port `5433` is mapped to internal container port `5432` (`5433:5432`) to prevent port conflicts with any locally running PostgreSQL instance or existing service on host port 5432. Inside the Docker network, the backend container connects directly to `postgres:5432`.
+### **Why PostgreSQL Host Port is 7003:**
+Host port `7003` is mapped to internal container port `5432` (`7003:5432`) to prevent port conflicts with local PostgreSQL instances or existing host services. Inside the Docker network, the backend container connects directly to `postgres:5432`.
 
 ---
 
@@ -51,9 +41,9 @@ Host port `5433` is mapped to internal container port `5432` (`5433:5432`) to pr
    ```
 
 4. **Access Applications:**
-   - **Frontend Dashboard:** [http://localhost:3000](http://localhost:3000)
-   - **Backend API:** [http://localhost:8081/api/claims](http://localhost:8081/api/claims)
-   - **PostgreSQL Database:** `localhost:5433` (`tpa_claims_db`)
+   - **Frontend Dashboard:** [http://localhost:7001](http://localhost:7001)
+   - **Backend API:** [http://localhost:7002/api/claims](http://localhost:7002/api/claims)
+   - **PostgreSQL Database:** `localhost:7003` (`tpa_claims_db`)
 
 5. **Stop Containers:**
    ```bash
@@ -68,9 +58,9 @@ Host port `5433` is mapped to internal container port `5432` (`5433:5432`) to pr
 - Java 21 LTS
 - Maven 3.9+
 - Node.js 20+
-- PostgreSQL listening on `localhost:5433` (or H2 test profile)
+- PostgreSQL listening on `localhost:7003` (or H2 test profile)
 
-#### 1. Backend Application (Port 8081)
+#### 1. Backend Application (Port 7002)
 ```bash
 # Build standalone executable JAR
 mvn clean package
@@ -82,7 +72,7 @@ java -jar target/tpa-claim-processor-1.0.0-SNAPSHOT.jar
 ./run.sh     # Linux / Mac
 ```
 
-#### 2. Frontend SPA (Port 3000)
+#### 2. Frontend SPA (Port 7001)
 ```bash
 cd frontend
 npm install

@@ -23,10 +23,10 @@ RUN rm -rf ./*
 # Copy compiled dist assets from builder stage
 COPY --from=builder /app/dist .
 
-# Copy custom Nginx configuration listening on port 3000
+# Copy custom Nginx configuration listening on port 7001
 COPY nginx.conf /etc/nginx/conf.d/default.conf
 
-# Expose frontend port 3000
-EXPOSE 3000
+# Expose frontend port 7001
+EXPOSE 7001
 
 CMD ["nginx", "-g", "daemon off;"]
