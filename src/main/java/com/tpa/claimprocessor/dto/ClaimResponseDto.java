@@ -28,6 +28,7 @@ public class ClaimResponseDto {
     private LocalDateTime createdAt;
     private LocalDateTime processedAt;
     private List<ClaimDocumentDto> documents;
+    private List<ClaimRuleResultDto> ruleResults;
 
     public ClaimResponseDto() {
     }
@@ -174,5 +175,13 @@ public class ClaimResponseDto {
 
     public void setDocuments(List<ClaimDocumentDto> documents) {
         this.documents = documents;
+    }
+
+    public List<ClaimRuleResultDto> getRuleResults() {
+        return ruleResults;
+    }
+
+    public void setRuleResults(List<ClaimRuleResultDto> ruleResults) {
+        this.ruleResults = ruleResults;
     }
 }

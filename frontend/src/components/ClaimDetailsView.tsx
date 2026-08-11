@@ -1,6 +1,7 @@
 import React from 'react';
 import { ClaimResponseDto } from '../types/claim';
 import { StatusBadge } from './StatusBadge';
+import { DecisionBanner } from './DecisionBanner';
 import { getExportPdfUrl } from '../services/api';
 import {
   ArrowLeft,
@@ -15,7 +16,6 @@ import {
   CheckCircle2,
   XCircle,
   AlertTriangle,
-  Info
 } from 'lucide-react';
 
 interface ClaimDetailsViewProps {
@@ -49,29 +49,33 @@ export const ClaimDetailsView: React.FC<ClaimDetailsViewProps> = ({ claim, onBac
         </a>
       </div>
 
-      {/* Decision Header Banner */}
-      <div className="bg-white rounded-3xl p-6 border border-slate-200 shadow-sm relative overflow-hidden">
+      {/* Decision Header Card */}
+      <div className={`bg-white rounded-3xl p-6 border shadow-sm relative overflow-hidden ${
+        claim.status === 'APPROVED'
+          ? 'border-emerald-200'
+          : claim.status === 'REJECTED'
+          ? 'border-rose-200'
+          : claim.status === 'NEEDS_MANUAL_REVIEW'
+          ? 'border-amber-200'
+          : 'border-slate-200'
+      }`}>
+        {/* Claim ID + Status Badge row */}
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-slate-100">
           <div>
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-3 flex-wrap">
               <h2 className="text-2xl font-black text-slate-900 tracking-tight">{claim.claimId}</h2>
               <StatusBadge status={claim.status} size="lg" />
             </div>
             <p className="text-xs text-slate-500 mt-1">
               Submitted on {new Date(claim.createdAt).toLocaleString()}
+              {claim.processedAt && ` · Processed ${new Date(claim.processedAt).toLocaleString()}`}
             </p>
           </div>
         </div>
 
-        {/* Decision Reason Callout */}
-        <div className="mt-4 p-4 rounded-2xl bg-slate-50 border border-slate-200/80 flex items-start gap-3">
-          <Info className="w-5 h-5 text-sky-600 shrink-0 mt-0.5" />
-          <div>
-            <h4 className="text-xs font-bold text-slate-900 uppercase tracking-wider">Adjudication Decision Reason</h4>
-            <p className="text-xs text-slate-700 font-medium mt-1 leading-relaxed">
-              {claim.decisionReason || 'Claim decision processing complete.'}
-            </p>
-          </div>
+        {/* Decision Banner — colour-coded APPROVED / REJECTED / NEEDS_MANUAL_REVIEW */}
+        <div className="mt-4">
+          <DecisionBanner status={claim.status} decisionReason={claim.decisionReason} />
         </div>
       </div>
 
@@ -124,7 +128,7 @@ export const ClaimDetailsView: React.FC<ClaimDetailsViewProps> = ({ claim, onBac
           <div>
             <h3 className="text-base font-bold text-slate-900 flex items-center gap-2">
               <FileCheck className="w-5 h-5 text-sky-600" />
-              Automated Business Rules Audit Trail (R01 - R10)
+              Automated Business Rules Audit Trail (R01 – R10)
             </h3>
             <p className="text-xs text-slate-500 mt-0.5">
               Deterministic rule evaluation results and priority matrix assessment.
@@ -139,47 +143,60 @@ export const ClaimDetailsView: React.FC<ClaimDetailsViewProps> = ({ claim, onBac
                 <tr className="bg-slate-50/80 border-b border-slate-200 text-[11px] font-bold text-slate-500 uppercase tracking-wider">
                   <th className="py-3.5 px-4">Rule ID</th>
                   <th className="py-3.5 px-4">Rule Description</th>
-                  <th className="py-3.5 px-4">Evaluation Result</th>
+                  <th className="py-3.5 px-4">Result</th>
                   <th className="py-3.5 px-4">Severity</th>
                   <th className="py-3.5 px-4">Audit Details / Trigger Reason</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100 text-xs">
-                {claim.ruleResults.map((rule) => (
-                  <tr key={rule.ruleCode} className="hover:bg-slate-50/60 transition-colors">
-                    <td className="py-3.5 px-4 font-mono font-bold text-slate-800">
-                      {rule.ruleCode}
-                    </td>
-                    <td className="py-3.5 px-4 font-semibold text-slate-900">
-                      {rule.ruleName}
-                    </td>
-                    <td className="py-3.5 px-4">
-                      {rule.passed ? (
-                        <span className="inline-flex items-center gap-1 text-emerald-700 bg-emerald-50 px-2.5 py-1 rounded-full text-[11px] font-bold border border-emerald-200">
-                          <CheckCircle2 className="w-3.5 h-3.5" />
-                          PASS
-                        </span>
-                      ) : (
-                        <span className="inline-flex items-center gap-1 text-rose-700 bg-rose-50 px-2.5 py-1 rounded-full text-[11px] font-bold border border-rose-200">
-                          <XCircle className="w-3.5 h-3.5" />
-                          FAIL
-                        </span>
-                      )}
-                    </td>
-                    <td className="py-3.5 px-4">
-                      {rule.severity === 'REJECTED' ? (
-                        <span className="text-rose-700 font-bold text-[11px]">REJECTED</span>
-                      ) : rule.severity === 'NEEDS_MANUAL_REVIEW' ? (
-                        <span className="text-amber-700 font-bold text-[11px]">MANUAL REVIEW</span>
-                      ) : (
-                        <span className="text-slate-400 font-medium text-[11px]">-</span>
-                      )}
-                    </td>
-                    <td className="py-3.5 px-4 text-slate-600 font-medium">
-                      {rule.details || 'Evaluated successfully.'}
-                    </td>
-                  </tr>
-                ))}
+                {claim.ruleResults.map((rule) => {
+                  const rowBg = !rule.passed
+                    ? rule.severity === 'REJECTED'
+                      ? 'bg-rose-50/40'
+                      : 'bg-amber-50/40'
+                    : '';
+
+                  return (
+                    <tr key={rule.ruleCode} className={`hover:bg-slate-50/60 transition-colors ${rowBg}`}>
+                      <td className="py-3.5 px-4 font-mono font-bold text-slate-800">
+                        {rule.ruleCode}
+                      </td>
+                      <td className="py-3.5 px-4 font-semibold text-slate-900">
+                        {rule.ruleName}
+                      </td>
+                      <td className="py-3.5 px-4">
+                        {rule.passed ? (
+                          <span className="inline-flex items-center gap-1 text-emerald-700 bg-emerald-50 px-2.5 py-1 rounded-full text-[11px] font-bold border border-emerald-200">
+                            <CheckCircle2 className="w-3.5 h-3.5" />
+                            PASS
+                          </span>
+                        ) : rule.severity === 'REJECTED' ? (
+                          <span className="inline-flex items-center gap-1 text-rose-700 bg-rose-50 px-2.5 py-1 rounded-full text-[11px] font-bold border border-rose-200">
+                            <XCircle className="w-3.5 h-3.5" />
+                            FAIL
+                          </span>
+                        ) : (
+                          <span className="inline-flex items-center gap-1 text-amber-700 bg-amber-50 px-2.5 py-1 rounded-full text-[11px] font-bold border border-amber-200">
+                            <AlertTriangle className="w-3.5 h-3.5" />
+                            FAIL
+                          </span>
+                        )}
+                      </td>
+                      <td className="py-3.5 px-4">
+                        {rule.severity === 'REJECTED' ? (
+                          <span className="inline-block px-2 py-0.5 rounded text-[10px] font-bold bg-rose-100 text-rose-700 border border-rose-200">REJECTED</span>
+                        ) : rule.severity === 'NEEDS_MANUAL_REVIEW' ? (
+                          <span className="inline-block px-2 py-0.5 rounded text-[10px] font-bold bg-amber-100 text-amber-700 border border-amber-200">MANUAL REVIEW</span>
+                        ) : (
+                          <span className="text-slate-400 font-medium text-[11px]">—</span>
+                        )}
+                      </td>
+                      <td className="py-3.5 px-4 text-slate-600 font-medium">
+                        {rule.details || 'Evaluated successfully.'}
+                      </td>
+                    </tr>
+                  );
+                })}
               </tbody>
             </table>
           </div>

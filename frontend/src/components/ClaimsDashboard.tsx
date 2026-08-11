@@ -167,7 +167,24 @@ export const ClaimsDashboard: React.FC<ClaimsDashboardProps> = ({
                       {claim.claimedAmount ? `₹${claim.claimedAmount.toLocaleString()}` : 'N/A'}
                     </td>
                     <td className="py-3.5 px-4">
-                      <StatusBadge status={claim.status} size="sm" />
+                      <div className="flex flex-col gap-1">
+                        <StatusBadge status={claim.status} size="sm" />
+                        {claim.decisionReason && (
+                          <span className={`text-[10px] font-medium leading-snug max-w-[180px] truncate ${
+                            claim.status === 'APPROVED'
+                              ? 'text-emerald-600'
+                              : claim.status === 'REJECTED'
+                              ? 'text-rose-600'
+                              : claim.status === 'NEEDS_MANUAL_REVIEW'
+                              ? 'text-amber-600'
+                              : 'text-slate-500'
+                          }`}>
+                            {claim.decisionReason.length > 60
+                              ? claim.decisionReason.substring(0, 60) + '…'
+                              : claim.decisionReason}
+                          </span>
+                        )}
+                      </div>
                     </td>
                     <td className="py-3.5 px-4 text-slate-500 text-[11px]">
                       {new Date(claim.createdAt).toLocaleDateString()}

@@ -107,3 +107,10 @@ CREATE TABLE IF NOT EXISTS claim_jsons (
     extracted_payload TEXT,
     created_at TIMESTAMP
 );
+
+-- 8. Seed Initial Active Policies
+INSERT INTO policies (policy_id, policy_number, customer_name, carrier_name, policy_name, start_date, end_date, sum_insured, max_coverage_amount, co_pay_percentage, deductible_amount, room_rent_capping_per_day, icu_rent_capping_per_day, status, created_at)
+VALUES 
+('PID-10001', 'POL-10001', 'Rahul Kumar', 'Aseuro Health Insurance', 'Health Secure Plus', '2026-01-01', '2026-12-31', 500000.00, 500000.00, 10.00, 5000.00, 5000.00, 10000.00, 'ACTIVE', CURRENT_TIMESTAMP),
+('PID-8899', 'POL-2026-8899', 'Rahul Sharma', 'Star Health Insurance', 'Comprehensive Health Care', '2026-01-01', '2026-12-31', 300000.00, 300000.00, 0.00, 0.00, 3000.00, 6000.00, 'ACTIVE', CURRENT_TIMESTAMP)
+ON CONFLICT (policy_number) DO NOTHING;

@@ -329,11 +329,13 @@ class RuleEngineAuditTest {
             claimRepository.saveAndFlush(dup);
 
             Claim claim = createBaseClaim("CLM-COMB-003");
+            claim.setPolicyNumber(null);
             ExtractedClaimData data = createCleanExtractedData();
             data.setPolicyNumber(null); // Extracted is null, triggering R04
             data.setClaimedAmount(new BigDecimal("99000.00"));
             data.setTotalBillAmount(new BigDecimal("10000.00")); // Triggers R08
             // Duplicate patient/admission triggers R10
+
 
             List<RuleEvaluationResult> results = ruleEngineService.evaluateAllRules(claim, data, activePolicy);
             decisionEngineService.applyDecision(claim, results);

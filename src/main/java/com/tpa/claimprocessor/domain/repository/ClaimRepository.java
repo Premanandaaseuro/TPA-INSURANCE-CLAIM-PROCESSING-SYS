@@ -16,7 +16,21 @@ public interface ClaimRepository extends JpaRepository<Claim, Long> {
 
     boolean existsByClaimId(String claimId);
 
+    boolean existsByPolicyNumber(String policyNumber);
+
     @Query("SELECT c.claimId FROM Claim c WHERE c.claimId LIKE CONCAT('CLM-', :year, '-%')")
     List<String> findClaimIdsByYear(@Param("year") int year);
-}
 
+    /**
+     * Fetch claim + documents eagerly (single bag JOIN FETCH is safe).
+     * ruleResults are loaded lazily within the active @Transactional session.
+     */
+    @Query("SELECT DISTINCT c FROM Claim c LEFT JOIN FETCH c.documents WHERE c.claimId = :claimId")
+    Optional<Claim> findByClaimIdWithDetails(@Param("claimId") String claimId);
+
+    /**
+     * Fetch all claims + documents eagerly. ruleResults lazy-loaded within transaction.
+     */
+    @Query("SELECT DISTINCT c FROM Claim c LEFT JOIN FETCH c.documents ORDER BY c.createdAt DESC")
+    List<Claim> findAllWithDetails();
+}

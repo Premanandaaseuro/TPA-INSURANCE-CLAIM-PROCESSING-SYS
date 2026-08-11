@@ -16,6 +16,7 @@ public class ExtractedClaimData {
     private LocalDate dischargeDate;
     private BigDecimal claimedAmount;
     private BigDecimal totalBillAmount;
+    private String claimType;
     private String billNumber;
     private LocalDate billDate;
     private String primaryDiagnosis;
@@ -114,6 +115,14 @@ public class ExtractedClaimData {
 
     public void setTotalBillAmount(BigDecimal totalBillAmount) {
         this.totalBillAmount = totalBillAmount;
+    }
+
+    public String getClaimType() {
+        return claimType;
+    }
+
+    public void setClaimType(String claimType) {
+        this.claimType = claimType;
     }
 
     public String getBillNumber() {

@@ -12,6 +12,7 @@ import com.tpa.claimprocessor.domain.repository.ClaimRepository;
 import com.tpa.claimprocessor.domain.repository.PolicyRepository;
 import com.tpa.claimprocessor.dto.ClaimDocumentDto;
 import com.tpa.claimprocessor.dto.ClaimResponseDto;
+import com.tpa.claimprocessor.dto.ClaimRuleResultDto;
 import com.tpa.claimprocessor.exception.ClaimNotFoundException;
 import com.tpa.claimprocessor.exception.InvalidDocumentException;
 import com.tpa.claimprocessor.extraction.ExtractedClaimData;
@@ -132,6 +133,13 @@ public class ClaimServiceImpl implements ClaimService {
         claim.setAdmissionDate(extractedData.getAdmissionDate());
         claim.setDischargeDate(extractedData.getDischargeDate());
         claim.setClaimedAmount(extractedData.getClaimedAmount());
+        if (extractedData.getClaimType() != null) {
+            try {
+                claim.setClaimType(com.tpa.claimprocessor.domain.enums.ClaimType.valueOf(extractedData.getClaimType().toUpperCase()));
+            } catch (Exception ignored) {
+            }
+        }
+
 
         // 8. Populate DischargeDetails Entity
         if (extractedData.getAdmissionDate() != null || extractedData.getDischargeDate() != null || extractedData.getPrimaryDiagnosis() != null) {
@@ -188,7 +196,11 @@ public class ClaimServiceImpl implements ClaimService {
         decisionEngineService.applyDecision(claim, ruleResults);
 
         // 14. Save Finalized Claim to PostgreSQL Database
-        Claim savedClaim = claimRepository.save(claim);
+        claimRepository.save(claim);
+
+        // 15. Re-fetch with all associations eagerly loaded for the response DTO
+        Claim savedClaim = claimRepository.findByClaimIdWithDetails(claimId)
+                .orElseThrow(() -> new ClaimNotFoundException("Claim not found after save: " + claimId));
 
         return mapToResponseDto(savedClaim);
     }
@@ -196,7 +208,7 @@ public class ClaimServiceImpl implements ClaimService {
     @Override
     @Transactional(readOnly = true)
     public List<ClaimResponseDto> getAllClaims() {
-        return claimRepository.findAll().stream()
+        return claimRepository.findAllWithDetails().stream()
                 .map(this::mapToResponseDto)
                 .collect(Collectors.toList());
     }
@@ -204,7 +216,7 @@ public class ClaimServiceImpl implements ClaimService {
     @Override
     @Transactional(readOnly = true)
     public ClaimResponseDto getClaimByClaimId(String claimId) {
-        Claim claim = claimRepository.findByClaimId(claimId)
+        Claim claim = claimRepository.findByClaimIdWithDetails(claimId)
                 .orElseThrow(() -> new ClaimNotFoundException("Claim not found with ID: " + claimId));
         return mapToResponseDto(claim);
     }
@@ -244,6 +256,22 @@ public class ClaimServiceImpl implements ClaimService {
                     ))
                     .collect(Collectors.toList());
             dto.setDocuments(docDtos);
+        }
+
+        if (claim.getRuleResults() != null) {
+            List<ClaimRuleResultDto> ruleDtos = claim.getRuleResults().stream()
+                    .map(r -> new ClaimRuleResultDto(
+                            r.getId(),
+                            r.getRuleCode(),
+                            r.getRuleName(),
+                            r.isPassed(),
+                            r.getSeverity(),
+                            r.getDetails(),
+                            r.getEvaluatedAt()
+                    ))
+                    .sorted(java.util.Comparator.comparing(ClaimRuleResultDto::getRuleCode))
+                    .collect(Collectors.toList());
+            dto.setRuleResults(ruleDtos);
         }
 
         return dto;

@@ -12,6 +12,9 @@ public class Policy {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(name = "policy_id")
+    private String policyId;
+
     @Column(name = "policy_number", nullable = false, unique = true)
     private String policyNumber;
 
@@ -56,6 +59,14 @@ public class Policy {
 
     public void setId(Long id) {
         this.id = id;
+    }
+
+    public String getPolicyId() {
+        return policyId;
+    }
+
+    public void setPolicyId(String policyId) {
+        this.policyId = policyId;
     }
 
     public String getPolicyNumber() {

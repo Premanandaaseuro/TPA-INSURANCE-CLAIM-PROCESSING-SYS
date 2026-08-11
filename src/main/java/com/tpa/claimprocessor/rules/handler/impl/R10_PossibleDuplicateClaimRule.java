@@ -30,25 +30,33 @@ public class R10_PossibleDuplicateClaimRule implements RuleHandler {
     public RuleEvaluationResult evaluate(Claim claim, ExtractedClaimData extractedData, Policy policy) {
         String policyNo = extractedData.getPolicyNumber() != null ? extractedData.getPolicyNumber() : claim.getPolicyNumber();
         String patientName = extractedData.getPatientName() != null ? extractedData.getPatientName() : claim.getPatientName();
+        String hospitalName = extractedData.getHospitalName() != null ? extractedData.getHospitalName() : claim.getHospitalName();
         LocalDate admissionDate = extractedData.getAdmissionDate() != null ? extractedData.getAdmissionDate() : claim.getAdmissionDate();
 
         if (patientName != null && admissionDate != null) {
             List<Claim> existingClaims = claimRepository.findAll();
             boolean duplicateExists = existingClaims.stream().anyMatch(existing -> {
-                if (existing.getClaimId() != null && existing.getClaimId().equals(claim.getClaimId())) {
+                if (existing.getId() != null && claim.getId() != null && existing.getId().equals(claim.getId())) {
                     return false;
                 }
-                String extPatient = existing.getPatientName();
-                LocalDate extAdmission = existing.getAdmissionDate();
-
-                boolean patientMatch = extPatient != null && extPatient.equalsIgnoreCase(patientName);
-                boolean admissionMatch = extAdmission != null && extAdmission.equals(admissionDate);
-
-                if (policyNo != null && existing.getPolicyNumber() != null) {
-                    return policyNo.equalsIgnoreCase(existing.getPolicyNumber()) && patientMatch && admissionMatch;
+                if (existing.getClaimId() != null && claim.getClaimId() != null && existing.getClaimId().equals(claim.getClaimId())) {
+                    return false;
                 }
 
-                return patientMatch && admissionMatch;
+                boolean patientMatch = existing.getPatientName() != null && existing.getPatientName().equalsIgnoreCase(patientName);
+                boolean admissionMatch = existing.getAdmissionDate() != null && existing.getAdmissionDate().equals(admissionDate);
+
+                boolean policyMatch = true;
+                if (policyNo != null && existing.getPolicyNumber() != null) {
+                    policyMatch = existing.getPolicyNumber().equalsIgnoreCase(policyNo);
+                }
+
+                boolean hospitalMatch = true;
+                if (hospitalName != null && existing.getHospitalName() != null) {
+                    hospitalMatch = existing.getHospitalName().equalsIgnoreCase(hospitalName);
+                }
+
+                return patientMatch && admissionMatch && policyMatch && hospitalMatch;
             });
 
             if (duplicateExists) {
