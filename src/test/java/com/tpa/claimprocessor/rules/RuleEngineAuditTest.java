@@ -138,12 +138,34 @@ class RuleEngineAuditTest {
         }
 
         @Test
-        @DisplayName("R03 - Policy Exists Check")
+        @DisplayName("R03 - Policy Inactive Check")
         void testR03() {
             Claim claim = createBaseClaim("CLM-TEST-005");
             ExtractedClaimData cleanData = createCleanExtractedData();
             RuleEvaluationResult passResult = r03Rule.evaluate(claim, cleanData, activePolicy);
             assertTrue(passResult.isPassed());
+
+            // Inactive Policy (POL-10002) test case
+            Policy inactivePolicy = new Policy(
+                    "POL-10002",
+                    "Family Care",
+                    "Priya Sharma",
+                    "Aseuro Insurance",
+                    LocalDate.of(2026, 1, 1),
+                    LocalDate.of(2026, 3, 31),
+                    new BigDecimal("300000.00"),
+                    "INACTIVE"
+            );
+
+            ExtractedClaimData inactiveData = createCleanExtractedData();
+            inactiveData.setPolicyNumber("POL-10002");
+            inactiveData.setPatientName("Priya Sharma");
+            inactiveData.setAdmissionDate(LocalDate.of(2026, 4, 10));
+
+            RuleEvaluationResult failInactive = r03Rule.evaluate(claim, inactiveData, inactivePolicy);
+            assertFalse(failInactive.isPassed());
+            assertEquals(RuleSeverity.REJECTED, failInactive.getSeverity());
+            assertTrue(failInactive.getDetails().contains("inactive on admission date"));
 
             // Null policy (policy does not exist in database)
             RuleEvaluationResult failResult = r03Rule.evaluate(claim, cleanData, null);

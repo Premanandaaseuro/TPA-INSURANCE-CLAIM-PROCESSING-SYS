@@ -30,7 +30,7 @@ INSERT INTO policies (
     deductible_amount, room_rent_capping_per_day, icu_rent_capping_per_day, status, created_at
 ) VALUES 
 ('PID-10001', 'POL-10001', 'Rahul Kumar', 'Aseuro Health Insurance', 'Aseuro Health Gold', '2026-01-01', '2026-12-31', 500000.00, 500000.00, 10.00, 5000.00, 5000.00, 10000.00, 'ACTIVE', NOW()),
-('PID-10002', 'POL-10002', 'Rohan Verma', 'Aseuro Health Insurance', 'Aseuro Health Silver', '2026-01-01', '2026-12-31', 400000.00, 400000.00, 5.00, 0.00, 5000.00, 10000.00, 'ACTIVE', NOW()),
+('PID-10002', 'POL-10002', 'Priya Sharma', 'Aseuro Health Insurance', 'Family Care', '2026-01-01', '2026-03-31', 300000.00, 300000.00, 5.00, 0.00, 5000.00, 10000.00, 'INACTIVE', NOW()),
 ('PID-10003', 'POL-10003', 'Test Patient', 'Aseuro Health Insurance', 'Health Basic Plan', '2025-01-01', '2026-03-31', 200000.00, 200000.00, 10.00, 0.00, 3000.00, 6000.00, 'INACTIVE', NOW()),
 ('PID-10004', 'POL-10004', 'Priya Sharma', 'Star Health Insurance', 'Comprehensive Care', '2026-01-01', '2026-12-31', 600000.00, 600000.00, 0.00, 0.00, 6000.00, 12000.00, 'ACTIVE', NOW()),
 ('PID-10005', 'POL-10005', 'Amit Patel', 'HDFC ERGO General Insurance', 'Optima Restore', '2026-01-01', '2026-12-31', 1000000.00, 1000000.00, 5.00, 0.00, 8000.00, 15000.00, 'ACTIVE', NOW()),
