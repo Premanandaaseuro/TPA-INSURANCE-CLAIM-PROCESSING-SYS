@@ -131,7 +131,7 @@ public class ClaimServiceImpl implements ClaimService {
 
         // 6. Structured Data Extraction (only extracts present documents)
         ExtractedClaimData extractedData = structuredDataParser.parse(formRawText, combinedRawText);
-        log.info("OCR EXTRACTED POLICY NUMBER = [{}]", extractedData.getPolicyNumber());
+        log.info("EXTRACTED POLICY NUMBER FROM CLAIM FORM = {}", extractedData.getPolicyNumber());
 
         // 7. Update Claim Entity with Structured Data
         claim.setPolicyNumber(extractedData.getPolicyNumber());

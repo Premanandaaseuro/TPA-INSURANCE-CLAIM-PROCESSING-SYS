@@ -18,14 +18,14 @@ public class R04_PolicyNumberMissingRule implements RuleHandler {
 
     @Override
     public RuleEvaluationResult evaluate(Claim claim, ExtractedClaimData extractedData, Policy policy) {
-        String policyNo = extractedData.getPolicyNumber() != null ? extractedData.getPolicyNumber() : claim.getPolicyNumber();
+        String policyNo = extractedData != null && extractedData.getPolicyNumber() != null ? extractedData.getPolicyNumber() : claim.getPolicyNumber();
 
         if (!isValidPolicyNumber(policyNo)) {
-            return RuleEvaluationResult.fail("R04", "Policy Number Missing Check", RuleSeverity.NEEDS_MANUAL_REVIEW,
-                    "R04 – Policy Number is missing from the uploaded Claim Form.");
+            return RuleEvaluationResult.fail("R04", "Policy Number Missing", RuleSeverity.NEEDS_MANUAL_REVIEW,
+                    "Policy Number was not found in the uploaded Claim Form.");
         }
 
-        return RuleEvaluationResult.pass("R04", "Policy Number Missing Check", "Policy Number extracted successfully (" + policyNo + ").");
+        return RuleEvaluationResult.pass("R04", "Policy Number Missing", "Policy Number extracted successfully (" + policyNo + ").");
     }
 
     public static boolean isValidPolicyNumber(String policyNo) {

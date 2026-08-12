@@ -4,6 +4,8 @@ import com.tpa.claimprocessor.domain.entity.Claim;
 import com.tpa.claimprocessor.domain.entity.ClaimRuleResult;
 import com.tpa.claimprocessor.domain.entity.Policy;
 import com.tpa.claimprocessor.extraction.ExtractedClaimData;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -12,6 +14,8 @@ import java.util.List;
 
 @Service
 public class RuleEngineServiceImpl implements RuleEngineService {
+
+    private static final Logger log = LoggerFactory.getLogger(RuleEngineServiceImpl.class);
 
     private final List<RuleHandler> ruleHandlers;
 
@@ -43,10 +47,13 @@ public class RuleEngineServiceImpl implements RuleEngineService {
         RuleEvaluationResult r04Result = null;
         if (r04 != null) {
             r04Result = executeAndRecord(r04, claim, extractedData, policy, results);
+            log.info("R04 CHECK = {}", r04Result.isPassed() ? "PASS" : "FAIL");
         }
 
-        // ONLY execute R03 if R04 passed!
-        if (r04Result != null && r04Result.isPassed() && r03 != null) {
+        boolean executingR03 = (r04Result != null && r04Result.isPassed() && r03 != null);
+        log.info("EXECUTING R03 = {}", executingR03);
+
+        if (executingR03) {
             executeAndRecord(r03, claim, extractedData, policy, results);
         }
 
