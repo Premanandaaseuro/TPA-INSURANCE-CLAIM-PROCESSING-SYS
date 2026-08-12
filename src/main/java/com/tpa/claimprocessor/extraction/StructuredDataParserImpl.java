@@ -28,137 +28,173 @@ public class StructuredDataParserImpl implements StructuredDataParser {
         data.setClaimFormRawText(claimFormRawText != null ? claimFormRawText : "");
         data.setCombinedDocRawText(combinedDocRawText != null ? combinedDocRawText : "");
 
-        String fullText = data.getClaimFormRawText() + "\n" + data.getCombinedDocRawText();
+        String formText = data.getClaimFormRawText();
+        String combinedText = data.getCombinedDocRawText();
+
+        // Separate Discharge Summary and Final Hospital Bill from combined text if sections exist
+        String dischargeSummaryText = combinedText;
+        String hospitalBillText = combinedText;
+
+        if (combinedText != null && !combinedText.isEmpty()) {
+            Pattern billHeaderPattern = Pattern.compile("(?i)(?:FINAL\\s*HOSPITAL\\s*BILL|HOSPITAL\\s*BILL|BILL\\s*DETAILS|INVOICE)");
+            Matcher billMatcher = billHeaderPattern.matcher(combinedText);
+            if (billMatcher.find()) {
+                int splitIndex = billMatcher.start();
+                dischargeSummaryText = combinedText.substring(0, splitIndex);
+                hospitalBillText = combinedText.substring(splitIndex);
+            }
+        }
+
+        String fullText = formText + "\n" + combinedText;
 
         // 1. Policy Number
-        String policyNo = extractLineRegex(claimFormRawText, "(?i)Policy\\s*(?:Number|No|#)\\s*[:\\-]\\s*([A-Za-z0-9\\-]{3,30})");
+        String policyNo = extractField(formText, "(?i)Policy\\s*(?:Number|No|#|Num)\\s*[:\\|\\-]?\\s*([A-Za-z0-9\\-]{3,30})");
         if (policyNo == null) {
-            policyNo = extractLineRegex(fullText, "(?i)Policy\\s*(?:Number|No|#)\\s*[:\\-]\\s*([A-Za-z0-9\\-]{3,30})");
-        }
-        if (policyNo == null) {
-            policyNo = extractLineRegex(claimFormRawText, "(?i)\\b(POL-[A-Za-z0-9\\-]+)\\b");
-        }
-        if (policyNo == null) {
-            policyNo = extractLineRegex(fullText, "(?i)\\b(POL-[A-Za-z0-9\\-]+)\\b");
+            policyNo = extractField(fullText, "(?i)\\b(POL-[A-Za-z0-9\\-]+)\\b");
         }
         data.setPolicyNumber(cleanPolicyNumber(policyNo));
 
         // 2. Policy ID
-        String policyId = extractLineRegex(claimFormRawText, "(?i)Policy\\s*ID\\s*[:\\-]\\s*([A-Za-z0-9\\-]{3,20})");
+        String policyId = extractField(formText, "(?i)Policy\\s*ID\\s*[:\\|\\-]?\\s*([A-Za-z0-9\\-]{3,20})");
         if (policyId == null) {
-            policyId = extractLineRegex(fullText, "(?i)Policy\\s*ID\\s*[:\\-]\\s*([A-Za-z0-9\\-]{3,20})");
+            policyId = extractField(fullText, "(?i)\\b(PID-[A-Za-z0-9\\-]+)\\b");
         }
         data.setPolicyId(cleanString(policyId));
 
-        // 3. Patient Name
-        String patientName = extractLineRegex(claimFormRawText, "(?i)(?:Patient\\s*Name|Name\\s*of\\s*Patient)\\s*[:\\-]\\s*([A-Za-z \\.\\'-]{2,50})");
-        if (patientName == null) {
-            patientName = extractLineRegex(combinedDocRawText, "(?i)(?:Patient\\s*Name|Name\\s*of\\s*Patient)\\s*[:\\-]\\s*([A-Za-z \\.\\'-]{2,50})");
-        }
-        if (patientName == null) {
-            patientName = extractLineRegex(fullText, "(?i)Patient\\s*[:\\-]\\s*([A-Za-z \\.\\'-]{2,50})");
-        }
-        data.setPatientName(cleanString(patientName));
+        // 3. Patient Name across sections
+        String cfPatient = extractField(formText, "(?i)(?:Patient\\s*Name|Name\\s*of\\s*Patient|Patient)\\s*[:\\|\\-]?\\s*([A-Za-z \\.\\'-]{2,50})");
+        String dsPatient = extractField(dischargeSummaryText, "(?i)(?:Patient\\s*Name|Name\\s*of\\s*Patient|Patient)\\s*[:\\|\\-]?\\s*([A-Za-z \\.\\'-]{2,50})");
+        String hbPatient = extractField(hospitalBillText, "(?i)(?:Patient\\s*Name|Name\\s*of\\s*Patient|Patient)\\s*[:\\|\\-]?\\s*([A-Za-z \\.\\'-]{2,50})");
+
+        data.setClaimFormPatientName(cleanString(cfPatient));
+        data.setDischargeSummaryPatientName(cleanString(dsPatient));
+        data.setHospitalBillPatientName(cleanString(hbPatient));
+
+        String primaryPatient = cleanString(cfPatient);
+        if (primaryPatient == null) primaryPatient = cleanString(dsPatient);
+        if (primaryPatient == null) primaryPatient = cleanString(hbPatient);
+        if (primaryPatient == null) primaryPatient = extractField(fullText, "(?i)Patient\\s*[:\\|\\-]?\\s*([A-Za-z \\.\\'-]{2,50})");
+        data.setPatientName(cleanString(primaryPatient));
 
         // 4. Customer Name / Policy Holder
-        String customerName = extractLineRegex(claimFormRawText, "(?i)(?:Customer\\s*Name|Policy\\s*Holder|Insured\\s*Name|Insured|Proposer\\s*Name)\\s*[:\\-]\\s*([A-Za-z \\.\\'-]{2,50})");
+        String customerName = extractField(formText, "(?i)(?:Customer\\s*Name|Policy\\s*Holder|Insured\\s*Name|Insured|Proposer\\s*Name)\\s*[:\\|\\-]?\\s*([A-Za-z \\.\\'-]{2,50})");
         if (customerName == null) {
             customerName = data.getPatientName();
         }
         data.setCustomerName(cleanString(customerName));
 
-        // 5. Carrier Name / Insurer
-        String carrierName = extractLineRegex(claimFormRawText, "(?i)(?:Carrier\\s*Name|Insurance\\s*Company|Insurer|Carrier)\\s*[:\\-]\\s*([A-Za-z0-9 \\.\\,]{3,50})");
+        // 5. Carrier Name
+        String carrierName = extractField(formText, "(?i)(?:Carrier\\s*Name|Insurance\\s*Company|Insurer|Carrier)\\s*[:\\|\\-]?\\s*([A-Za-z0-9 \\.\\,]{3,50})");
         if (carrierName == null) {
-            carrierName = extractLineRegex(fullText, "(?i)(?:Carrier\\s*Name|Insurance\\s*Company|Insurer|Carrier)\\s*[:\\-]\\s*([A-Za-z0-9 \\.\\,]{3,50})");
+            carrierName = extractField(fullText, "(?i)(?:Carrier\\s*Name|Insurance\\s*Company|Insurer|Carrier)\\s*[:\\|\\-]?\\s*([A-Za-z0-9 \\.\\,]{3,50})");
         }
         data.setCarrierName(cleanString(carrierName));
 
         // 6. Policy Name
-        String policyName = extractLineRegex(claimFormRawText, "(?i)(?:Policy\\s*Name|Plan\\s*Name|Scheme\\s*Name|Plan)\\s*[:\\-]\\s*([A-Za-z0-9 \\-]{3,50})");
+        String policyName = extractField(formText, "(?i)(?:Policy\\s*Name|Plan\\s*Name|Scheme\\s*Name|Plan)\\s*[:\\|\\-]?\\s*([A-Za-z0-9 \\-]{3,50})");
         if (policyName == null) {
-            policyName = extractLineRegex(fullText, "(?i)(?:Policy\\s*Name|Plan\\s*Name|Scheme\\s*Name|Plan)\\s*[:\\-]\\s*([A-Za-z0-9 \\-]{3,50})");
+            policyName = extractField(fullText, "(?i)(?:Policy\\s*Name|Plan\\s*Name|Scheme\\s*Name|Plan)\\s*[:\\|\\-]?\\s*([A-Za-z0-9 \\-]{3,50})");
         }
         data.setPolicyName(cleanString(policyName));
 
-        // 7. Hospital Name
-        String hospitalName = extractLineRegex(combinedDocRawText, "(?i)(?:Hospital\\s*Name|Name\\s*of\\s*Hospital)\\s*[:\\-]\\s*([A-Za-z0-9 \\,\\.\\'-]{3,60})");
-        if (hospitalName == null) {
-            hospitalName = extractLineRegex(claimFormRawText, "(?i)(?:Hospital\\s*Name|Name\\s*of\\s*Hospital)\\s*[:\\-]\\s*([A-Za-z0-9 \\,\\.\\'-]{3,60})");
-        }
-        if (hospitalName == null) {
-            hospitalName = extractLineRegex(fullText, "(?i)(?:Hospital|Medical\\s*Center)\\s*[:\\-]\\s*([A-Za-z0-9 \\,\\.\\'-]{3,60})");
-        }
-        data.setHospitalName(cleanString(hospitalName));
+        // 7. Hospital Name across sections
+        String hospitalRegex = "(?i)(?:Hospital\\s*Name|Name\\s*of\\s*Hospital|Medical\\s*Center|Hospital(?!\\s*Bill))\\s*[:\\|\\-]?\\s*([A-Za-z0-9 \\,\\.\\'-]{3,60})";
+        String cfHospital = extractField(formText, hospitalRegex);
+        String dsHospital = extractField(dischargeSummaryText, hospitalRegex);
+        String hbHospital = extractField(hospitalBillText, hospitalRegex);
+
+        data.setClaimFormHospitalName(cleanString(cfHospital));
+        data.setDischargeSummaryHospitalName(cleanString(dsHospital));
+        data.setHospitalBillHospitalName(cleanString(hbHospital));
+
+        String primaryHospital = cleanString(cfHospital);
+        if (primaryHospital == null) primaryHospital = cleanString(dsHospital);
+        if (primaryHospital == null) primaryHospital = cleanString(hbHospital);
+        data.setHospitalName(cleanString(primaryHospital));
 
         // 8. Admission Date
-        String admissionDateStr = extractLineRegex(claimFormRawText, "(?i)(?:Admission\\s*Date|Date\\s*of\\s*Admission|DOA)\\s*[:\\-]?\\s*(\\d{2,4}[\\/\\-]\\d{1,2}[\\/\\-]\\d{2,4})");
-        if (admissionDateStr == null) {
-            admissionDateStr = extractLineRegex(combinedDocRawText, "(?i)(?:Admission\\s*Date|Date\\s*of\\s*Admission|DOA)\\s*[:\\-]?\\s*(\\d{2,4}[\\/\\-]\\d{1,2}[\\/\\-]\\d{2,4})");
+        String cfAdmissionStr = extractField(formText, "(?i)(?:Admission\\s*Date|Date\\s*of\\s*Admission|DOA|Admitted\\s*On)\\s*[:\\|\\-]?\\s*(\\d{2,4}[\\/\\-]\\d{1,2}[\\/\\-]\\d{2,4})");
+        String dsAdmissionStr = extractField(dischargeSummaryText, "(?i)(?:Admission\\s*Date|Date\\s*of\\s*Admission|DOA|Admitted\\s*On)\\s*[:\\|\\-]?\\s*(\\d{2,4}[\\/\\-]\\d{1,2}[\\/\\-]\\d{2,4})");
+        data.setClaimFormAdmissionDate(parseDate(cfAdmissionStr));
+        data.setDischargeSummaryAdmissionDate(parseDate(dsAdmissionStr));
+
+        LocalDate primaryAdmission = parseDate(cfAdmissionStr);
+        if (primaryAdmission == null) primaryAdmission = parseDate(dsAdmissionStr);
+        if (primaryAdmission == null) {
+            String admFallback = extractField(fullText, "(?i)(?:Admission\\s*Date|Date\\s*of\\s*Admission|DOA)\\s*[:\\|\\-]?\\s*(\\d{2,4}[\\/\\-]\\d{1,2}[\\/\\-]\\d{2,4})");
+            primaryAdmission = parseDate(admFallback);
         }
-        data.setAdmissionDate(parseDate(admissionDateStr));
+        data.setAdmissionDate(primaryAdmission);
 
         // 9. Discharge Date
-        String dischargeDateStr = extractLineRegex(claimFormRawText, "(?i)(?:Discharge\\s*Date|Date\\s*of\\s*Discharge|DOD)\\s*[:\\-]?\\s*(\\d{2,4}[\\/\\-]\\d{1,2}[\\/\\-]\\d{2,4})");
-        if (dischargeDateStr == null) {
-            dischargeDateStr = extractLineRegex(combinedDocRawText, "(?i)(?:Discharge\\s*Date|Date\\s*of\\s*Discharge|DOD)\\s*[:\\-]?\\s*(\\d{2,4}[\\/\\-]\\d{1,2}[\\/\\-]\\d{2,4})");
+        String cfDischargeStr = extractField(formText, "(?i)(?:Discharge\\s*Date|Date\\s*of\\s*Discharge|DOD|Discharged\\s*On)\\s*[:\\|\\-]?\\s*(\\d{2,4}[\\/\\-]\\d{1,2}[\\/\\-]\\d{2,4})");
+        String dsDischargeStr = extractField(dischargeSummaryText, "(?i)(?:Discharge\\s*Date|Date\\s*of\\s*Discharge|DOD|Discharged\\s*On)\\s*[:\\|\\-]?\\s*(\\d{2,4}[\\/\\-]\\d{1,2}[\\/\\-]\\d{2,4})");
+        data.setClaimFormDischargeDate(parseDate(cfDischargeStr));
+        data.setDischargeSummaryDischargeDate(parseDate(dsDischargeStr));
+
+        LocalDate primaryDischarge = parseDate(cfDischargeStr);
+        if (primaryDischarge == null) primaryDischarge = parseDate(dsDischargeStr);
+        if (primaryDischarge == null) {
+            String disFallback = extractField(fullText, "(?i)(?:Discharge\\s*Date|Date\\s*of\\s*Discharge|DOD)\\s*[:\\|\\-]?\\s*(\\d{2,4}[\\/\\-]\\d{1,2}[\\/\\-]\\d{2,4})");
+            primaryDischarge = parseDate(disFallback);
         }
-        data.setDischargeDate(parseDate(dischargeDateStr));
+        data.setDischargeDate(primaryDischarge);
 
         // 10. Claimed Amount
-        String claimedAmountLine = extractLineRegex(claimFormRawText, "(?i)(?:Claimed\\s*Amount|Claim\\s*Amount|Amount\\s*Claimed)\\s*[:\\-]?\\s*([^\\r\\n]+)");
+        String claimedAmountLine = extractField(formText, "(?i)(?:Claimed\\s*Amount|Claim\\s*Amount|Amount\\s*Claimed)\\s*[:\\|\\-]?\\s*([^\\r\\n]+)");
         if (claimedAmountLine == null) {
-            claimedAmountLine = extractLineRegex(fullText, "(?i)(?:Claimed\\s*Amount|Claim\\s*Amount|Amount\\s*Claimed)\\s*[:\\-]?\\s*([^\\r\\n]+)");
+            claimedAmountLine = extractField(fullText, "(?i)(?:Claimed\\s*Amount|Claim\\s*Amount|Amount\\s*Claimed)\\s*[:\\|\\-]?\\s*([^\\r\\n]+)");
         }
         data.setClaimedAmount(parseAmount(claimedAmountLine));
 
         // 11. Total Bill Amount
-        String totalBillLine = extractLineRegex(combinedDocRawText, "(?i)(?:Total\\s*Bill\\s*Amount|Total\\s*Bill|Grand\\s*Total|Net\\s*Amount|Total\\s*Amount)\\s*[:\\-]?\\s*([^\\r\\n]+)");
+        String totalBillLine = extractField(hospitalBillText, "(?i)(?:Total\\s*Bill\\s*Amount|Total\\s*Bill|Grand\\s*Total|Net\\s*Amount|Total\\s*Amount|Bill\\s*Amount)\\s*[:\\|\\-]?\\s*([^\\r\\n]+)");
         if (totalBillLine == null) {
-            totalBillLine = extractLineRegex(fullText, "(?i)(?:Total\\s*Bill\\s*Amount|Total\\s*Bill|Grand\\s*Total|Net\\s*Amount|Total\\s*Amount)\\s*[:\\-]?\\s*([^\\r\\n]+)");
+            totalBillLine = extractField(combinedText, "(?i)(?:Total\\s*Bill\\s*Amount|Total\\s*Bill|Grand\\s*Total|Net\\s*Amount|Total\\s*Amount|Bill\\s*Amount)\\s*[:\\|\\-]?\\s*([^\\r\\n]+)");
         }
         data.setTotalBillAmount(parseAmount(totalBillLine));
 
         // 12. Claim Type
-        String claimTypeStr = extractLineRegex(claimFormRawText, "(?i)(?:Claim\\s*Type|Type\\s*of\\s*Claim)\\s*[:\\-]?\\s*([A-Za-z]+)");
+        String claimTypeStr = extractField(formText, "(?i)(?:Claim\\s*Type|Type\\s*of\\s*Claim)\\s*[:\\|\\-]?\\s*([A-Za-z]+)");
         data.setClaimType(cleanString(claimTypeStr));
 
         // 13. Bill Number
-        String billNo = extractLineRegex(combinedDocRawText, "(?i)(?:Bill\\s*No|Bill\\s*Number|Invoice\\s*No)\\s*[:\\-]?\\s*([A-Z0-9\\-]{3,20})");
+        String billNo = extractField(hospitalBillText, "(?i)(?:Bill\\s*No|Bill\\s*Number|Invoice\\s*No|Bill\\s*#)\\s*[:\\|\\-]?\\s*([A-Z0-9\\-]{3,20})");
+        if (billNo == null) {
+            billNo = extractField(combinedText, "(?i)\\b(BILL-[A-Za-z0-9\\-]+)\\b");
+        }
         data.setBillNumber(cleanString(billNo));
 
         // 14. Primary Diagnosis
-        String diagnosis = extractLineRegex(combinedDocRawText, "(?i)(?:Diagnosis|Primary\\s*Diagnosis|Illness)\\s*[:\\-]?\\s*([A-Za-z0-9 \\,]{3,100})");
+        String diagnosis = extractField(dischargeSummaryText, "(?i)(?:Diagnosis|Primary\\s*Diagnosis|Illness)\\s*[:\\|\\-]?\\s*([A-Za-z0-9 \\,\\.\\-]{3,100})");
         data.setPrimaryDiagnosis(cleanString(diagnosis));
 
         // 15. Treating Doctor
-        String doctor = extractLineRegex(combinedDocRawText, "(?i)(?:Treating\\s*Doctor|Doctor\\s*Name|Dr\\.)\\s*[:\\-]?\\s*([A-Za-z \\.]{3,40})");
+        String doctor = extractField(dischargeSummaryText, "(?i)(?:Treating\\s*Doctor|Doctor\\s*Name|Dr\\.)\\s*[:\\|\\-]?\\s*([A-Za-z \\.]{3,40})");
         data.setTreatingDoctor(cleanString(doctor));
 
         // 16. Room & Pharmacy Charges
-        String roomChargesLine = extractLineRegex(combinedDocRawText, "(?i)(?:Room\\s*Charges|Room\\s*Rent)\\s*[:\\-]?\\s*([^\\r\\n]+)");
+        String roomChargesLine = extractField(hospitalBillText, "(?i)(?:Room\\s*Charges|Room\\s*Rent)\\s*[:\\|\\-]?\\s*([^\\r\\n]+)");
         data.setRoomCharges(parseAmount(roomChargesLine));
 
-        String pharmacyChargesLine = extractLineRegex(combinedDocRawText, "(?i)(?:Pharmacy|Medicines|Pharmacy\\s*Charges)\\s*[:\\-]?\\s*([^\\r\\n]+)");
+        String pharmacyChargesLine = extractField(hospitalBillText, "(?i)(?:Pharmacy|Medicines|Pharmacy\\s*Charges)\\s*[:\\|\\-]?\\s*([^\\r\\n]+)");
         data.setPharmacyCharges(parseAmount(pharmacyChargesLine));
 
         return data;
     }
 
-    private String extractLineRegex(String text, String regex) {
-        if (text == null || text.isEmpty()) {
+    private String extractField(String text, String regex) {
+        if (text == null || text.trim().isEmpty()) {
             return null;
         }
-        String[] lines = text.split("\\r?\\n");
-        Pattern pattern = Pattern.compile(regex);
-
-        for (String line : lines) {
-            Matcher matcher = pattern.matcher(line);
-            if (matcher.find()) {
-                if (matcher.groupCount() >= 1) {
-                    return matcher.group(1).trim();
-                }
-                return matcher.group(0).trim();
+        Pattern pattern = Pattern.compile(regex, Pattern.CASE_INSENSITIVE);
+        Matcher matcher = pattern.matcher(text);
+        if (matcher.find()) {
+            String result = (matcher.groupCount() >= 1) ? matcher.group(matcher.groupCount()) : matcher.group(0);
+            if (result != null) {
+                result = result.replaceAll("(?i)^(?:Name|Holder|Details|Number|No|#|ID)\\s*[:\\|\\-]?\\s*", "").trim();
+                result = result.replaceAll("^[:\\|\\-\\s]+", "").trim();
+                return result.isEmpty() ? null : result;
             }
         }
         return null;
@@ -184,7 +220,8 @@ public class StructuredDataParserImpl implements StructuredDataParser {
         if (cleaned.isEmpty()) return null;
         String upper = cleaned.toUpperCase();
         if (upper.equals("N/A") || upper.equals("UNKNOWN") || upper.equals("NONE") || upper.equals("NULL")
-                || upper.equals("NAME") || upper.equals("DETAILS") || upper.equals("NUMBER") || upper.equals("POLICY")) {
+                || upper.equals("NAME") || upper.equals("DETAILS") || upper.equals("NUMBER") || upper.equals("POLICY")
+                || upper.equals("BILL") || upper.equals("HOSPITAL BILL") || upper.equals("SUMMARY") || upper.equals("DISCHARGE SUMMARY")) {
             return null;
         }
         return cleaned;

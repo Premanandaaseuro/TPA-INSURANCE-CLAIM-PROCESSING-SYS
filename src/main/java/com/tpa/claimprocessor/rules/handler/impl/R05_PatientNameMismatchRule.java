@@ -19,22 +19,39 @@ public class R05_PatientNameMismatchRule implements RuleHandler {
     @Override
     public RuleEvaluationResult evaluate(Claim claim, ExtractedClaimData extractedData, Policy policy) {
         String patientName = extractedData.getPatientName() != null ? extractedData.getPatientName() : claim.getPatientName();
-        String policyCustomerName = policy != null ? policy.getCustomerName() : null;
 
         if (patientName == null || patientName.trim().isEmpty()) {
             return RuleEvaluationResult.fail("R05", "Patient Name Mismatch Check", RuleSeverity.NEEDS_MANUAL_REVIEW, "Patient Name is missing from documents.");
         }
 
-        if (policyCustomerName != null && !policyCustomerName.trim().isEmpty()) {
-            String normPatient = patientName.toLowerCase().replaceAll("[^a-z]", "");
-            String normCustomer = policyCustomerName.toLowerCase().replaceAll("[^a-z]", "");
+        String cfPatient = extractedData.getClaimFormPatientName();
+        String dsPatient = extractedData.getDischargeSummaryPatientName();
+        String hbPatient = extractedData.getHospitalBillPatientName();
 
-            if (!normPatient.contains(normCustomer) && !normCustomer.contains(normPatient)) {
-                return RuleEvaluationResult.fail("R05", "Patient Name Mismatch Check", RuleSeverity.NEEDS_MANUAL_REVIEW,
-                        "Patient Name ('" + patientName + "') mismatches Policy record ('" + policyCustomerName + "').");
-            }
+        if (cfPatient != null && dsPatient != null && !isNormalizedMatch(cfPatient, dsPatient)) {
+            return RuleEvaluationResult.fail("R05", "Patient Name Mismatch Check", RuleSeverity.NEEDS_MANUAL_REVIEW,
+                    "Patient Name mismatch between Claim Form ('" + cfPatient + "') and Discharge Summary ('" + dsPatient + "').");
         }
 
-        return RuleEvaluationResult.pass("R05", "Patient Name Mismatch Check", "Patient name matches policy records.");
+        if (cfPatient != null && hbPatient != null && !isNormalizedMatch(cfPatient, hbPatient)) {
+            return RuleEvaluationResult.fail("R05", "Patient Name Mismatch Check", RuleSeverity.NEEDS_MANUAL_REVIEW,
+                    "Patient Name mismatch between Claim Form ('" + cfPatient + "') and Hospital Bill ('" + hbPatient + "').");
+        }
+
+        String policyCustomerName = policy != null ? policy.getCustomerName() : null;
+        if (policyCustomerName != null && !policyCustomerName.trim().isEmpty() && !isNormalizedMatch(patientName, policyCustomerName)) {
+            return RuleEvaluationResult.fail("R05", "Patient Name Mismatch Check", RuleSeverity.NEEDS_MANUAL_REVIEW,
+                    "Patient Name ('" + patientName + "') mismatches Policy record ('" + policyCustomerName + "').");
+        }
+
+        return RuleEvaluationResult.pass("R05", "Patient Name Mismatch Check", "Patient name matches across claim form, discharge summary and hospital bill.");
+    }
+
+    private boolean isNormalizedMatch(String s1, String s2) {
+        if (s1 == null || s2 == null) return true;
+        String n1 = s1.trim().toLowerCase().replaceAll("[^a-z0-9]", "");
+        String n2 = s2.trim().toLowerCase().replaceAll("[^a-z0-9]", "");
+        if (n1.isEmpty() || n2.isEmpty()) return true;
+        return n1.equals(n2) || n1.contains(n2) || n2.contains(n1);
     }
 }

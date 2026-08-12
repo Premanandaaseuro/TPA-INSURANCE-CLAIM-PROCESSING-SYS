@@ -279,7 +279,7 @@ class RuleEngineAuditTest {
             decisionEngineService.applyDecision(claim, results);
 
             assertEquals(ClaimStatus.APPROVED, claim.getStatus());
-            assertTrue(claim.getDecisionReason().contains("auto-APPROVED"));
+            assertTrue(claim.getDecisionReason().toLowerCase().contains("approved"));
             assertEquals(10, claim.getRuleResults().size());
             assertTrue(claim.getRuleResults().stream().allMatch(r -> r.isPassed()));
         }

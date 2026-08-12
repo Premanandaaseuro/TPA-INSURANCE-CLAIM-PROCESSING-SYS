@@ -34,20 +34,20 @@ public class DecisionEngineServiceImpl implements DecisionEngineService {
         if (!rejectedFailures.isEmpty()) {
             claim.setStatus(ClaimStatus.REJECTED);
             String reasons = rejectedFailures.stream()
-                    .map(r -> r.getRuleCode() + ": " + r.getDetails())
+                    .map(r -> r.getRuleCode() + " — " + r.getDetails())
                     .collect(Collectors.joining(" | "));
-            claim.setDecisionReason("Claim REJECTED: " + reasons);
+            claim.setDecisionReason("Claim rejected: " + reasons);
 
         } else if (!manualReviewFailures.isEmpty()) {
             claim.setStatus(ClaimStatus.NEEDS_MANUAL_REVIEW);
             String reasons = manualReviewFailures.stream()
-                    .map(r -> r.getRuleCode() + ": " + r.getDetails())
+                    .map(r -> r.getRuleCode() + " — " + r.getDetails())
                     .collect(Collectors.joining(" | "));
-            claim.setDecisionReason("Claim flagged for MANUAL REVIEW: " + reasons);
+            claim.setDecisionReason("Claim requires manual review: " + reasons);
 
         } else {
             claim.setStatus(ClaimStatus.APPROVED);
-            claim.setDecisionReason("Claim auto-APPROVED. All 10 business validation rules passed clean.");
+            claim.setDecisionReason("Claim approved. All mandatory validation rules passed and no duplicate claim was detected.");
         }
 
         claim.setProcessedAt(LocalDateTime.now());

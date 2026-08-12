@@ -26,6 +26,20 @@ public class ExtractedClaimData {
     private String claimFormRawText;
     private String combinedDocRawText;
 
+    private String claimFormPatientName;
+    private String dischargeSummaryPatientName;
+    private String hospitalBillPatientName;
+
+    private String claimFormHospitalName;
+    private String dischargeSummaryHospitalName;
+    private String hospitalBillHospitalName;
+
+    private LocalDate claimFormAdmissionDate;
+    private LocalDate dischargeSummaryAdmissionDate;
+
+    private LocalDate claimFormDischargeDate;
+    private LocalDate dischargeSummaryDischargeDate;
+
     public ExtractedClaimData() {
     }
 
@@ -187,5 +201,85 @@ public class ExtractedClaimData {
 
     public void setCombinedDocRawText(String combinedDocRawText) {
         this.combinedDocRawText = combinedDocRawText;
+    }
+
+    public String getClaimFormPatientName() {
+        return claimFormPatientName;
+    }
+
+    public void setClaimFormPatientName(String claimFormPatientName) {
+        this.claimFormPatientName = claimFormPatientName;
+    }
+
+    public String getDischargeSummaryPatientName() {
+        return dischargeSummaryPatientName;
+    }
+
+    public void setDischargeSummaryPatientName(String dischargeSummaryPatientName) {
+        this.dischargeSummaryPatientName = dischargeSummaryPatientName;
+    }
+
+    public String getHospitalBillPatientName() {
+        return hospitalBillPatientName;
+    }
+
+    public void setHospitalBillPatientName(String hospitalBillPatientName) {
+        this.hospitalBillPatientName = hospitalBillPatientName;
+    }
+
+    public String getClaimFormHospitalName() {
+        return claimFormHospitalName;
+    }
+
+    public void setClaimFormHospitalName(String claimFormHospitalName) {
+        this.claimFormHospitalName = claimFormHospitalName;
+    }
+
+    public String getDischargeSummaryHospitalName() {
+        return dischargeSummaryHospitalName;
+    }
+
+    public void setDischargeSummaryHospitalName(String dischargeSummaryHospitalName) {
+        this.dischargeSummaryHospitalName = dischargeSummaryHospitalName;
+    }
+
+    public String getHospitalBillHospitalName() {
+        return hospitalBillHospitalName;
+    }
+
+    public void setHospitalBillHospitalName(String hospitalBillHospitalName) {
+        this.hospitalBillHospitalName = hospitalBillHospitalName;
+    }
+
+    public LocalDate getClaimFormAdmissionDate() {
+        return claimFormAdmissionDate;
+    }
+
+    public void setClaimFormAdmissionDate(LocalDate claimFormAdmissionDate) {
+        this.claimFormAdmissionDate = claimFormAdmissionDate;
+    }
+
+    public LocalDate getDischargeSummaryAdmissionDate() {
+        return dischargeSummaryAdmissionDate;
+    }
+
+    public void setDischargeSummaryAdmissionDate(LocalDate dischargeSummaryAdmissionDate) {
+        this.dischargeSummaryAdmissionDate = dischargeSummaryAdmissionDate;
+    }
+
+    public LocalDate getClaimFormDischargeDate() {
+        return claimFormDischargeDate;
+    }
+
+    public void setClaimFormDischargeDate(LocalDate claimFormDischargeDate) {
+        this.claimFormDischargeDate = claimFormDischargeDate;
+    }
+
+    public LocalDate getDischargeSummaryDischargeDate() {
+        return dischargeSummaryDischargeDate;
+    }
+
+    public void setDischargeSummaryDischargeDate(LocalDate dischargeSummaryDischargeDate) {
+        this.dischargeSummaryDischargeDate = dischargeSummaryDischargeDate;
     }
 }

@@ -32,6 +32,20 @@ public class R07_DateMismatchRule implements RuleHandler {
                     "Admission date (" + admissionDate + ") cannot be after discharge date (" + dischargeDate + ").");
         }
 
-        return RuleEvaluationResult.pass("R07", "Admission/Discharge Date Check", "Admission and discharge dates match and are logical.");
+        LocalDate cfAdm = extractedData.getClaimFormAdmissionDate();
+        LocalDate dsAdm = extractedData.getDischargeSummaryAdmissionDate();
+        if (cfAdm != null && dsAdm != null && !cfAdm.equals(dsAdm)) {
+            return RuleEvaluationResult.fail("R07", "Admission/Discharge Date Check", RuleSeverity.NEEDS_MANUAL_REVIEW,
+                    "Admission date mismatch between Claim Form (" + cfAdm + ") and Discharge Summary (" + dsAdm + ").");
+        }
+
+        LocalDate cfDis = extractedData.getClaimFormDischargeDate();
+        LocalDate dsDis = extractedData.getDischargeSummaryDischargeDate();
+        if (cfDis != null && dsDis != null && !cfDis.equals(dsDis)) {
+            return RuleEvaluationResult.fail("R07", "Admission/Discharge Date Check", RuleSeverity.NEEDS_MANUAL_REVIEW,
+                    "Discharge date mismatch between Claim Form (" + cfDis + ") and Discharge Summary (" + dsDis + ").");
+        }
+
+        return RuleEvaluationResult.pass("R07", "Admission/Discharge Date Check", "Admission and discharge dates match across documents and are logically valid.");
     }
 }
