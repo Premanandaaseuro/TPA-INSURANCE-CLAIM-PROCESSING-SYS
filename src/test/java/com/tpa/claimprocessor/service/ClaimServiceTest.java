@@ -99,6 +99,19 @@ class ClaimServiceTest {
             return claim;
         });
 
+        when(claimRepository.findByClaimIdWithDetails(anyString())).thenAnswer(invocation -> {
+            Claim claim = new Claim();
+            claim.setId(1L);
+            claim.setClaimId("CLM-2026-000001");
+            claim.setStatus(ClaimStatus.APPROVED);
+            com.tpa.claimprocessor.domain.entity.ClaimDocument doc1 = new com.tpa.claimprocessor.domain.entity.ClaimDocument();
+            doc1.setDocumentType(DocumentType.CLAIM_FORM);
+            com.tpa.claimprocessor.domain.entity.ClaimDocument doc2 = new com.tpa.claimprocessor.domain.entity.ClaimDocument();
+            doc2.setDocumentType(DocumentType.COMBINED_HOSPITAL_DOCUMENT);
+            claim.setDocuments(java.util.List.of(doc1, doc2));
+            return java.util.Optional.of(claim);
+        });
+
         ClaimResponseDto result = claimService.createClaim(validClaimForm, validCombinedDoc);
 
         assertNotNull(result);
