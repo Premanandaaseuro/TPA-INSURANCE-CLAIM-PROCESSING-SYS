@@ -27,6 +27,7 @@ export interface ClaimRuleResultDto {
 export interface ClaimResponseDto {
   id: number;
   claimId: string;
+  claimNumber?: string;
   policyNumber?: string;
   policyId?: string;
   customerName?: string;
