@@ -357,10 +357,53 @@ class RuleEngineAuditTest {
             assertTrue(claim.getDecisionReason().contains("R04"), "Expected R04 in decision reason, but was: " + claim.getDecisionReason());
             assertTrue(claim.getDecisionReason().contains("R08"), "Expected R08 in decision reason, but was: " + claim.getDecisionReason());
             assertTrue(claim.getDecisionReason().contains("R10"), "Expected R10 in decision reason, but was: " + claim.getDecisionReason());
-            assertEquals(10, claim.getRuleResults().size());
+            // R03 skipped because R04 failed -> 9 rule results recorded
+            assertEquals(9, claim.getRuleResults().size());
+            assertFalse(claim.getRuleResults().stream().anyMatch(r -> "R03".equals(r.getRuleCode())));
+        }
 
+        @Test
+        @DisplayName("TEST 1 - Missing Policy Number -> R04 FAIL, R03 SKIPPED, Status NEEDS_MANUAL_REVIEW")
+        void testMissingPolicyNumber_SkipsR03() {
+            Claim claim = createBaseClaim("CLM-R04-001");
+            claim.setPolicyNumber(null);
+            ExtractedClaimData data = createCleanExtractedData();
+            data.setPolicyNumber(null);
 
+            List<RuleEvaluationResult> results = ruleEngineService.evaluateAllRules(claim, data, activePolicy);
+            decisionEngineService.applyDecision(claim, results);
 
+            assertEquals(ClaimStatus.NEEDS_MANUAL_REVIEW, claim.getStatus());
+            assertTrue(claim.getRuleResults().stream().anyMatch(r -> "R04".equals(r.getRuleCode()) && !r.isPassed()));
+            assertFalse(claim.getRuleResults().stream().anyMatch(r -> "R03".equals(r.getRuleCode())));
+        }
+
+        @Test
+        @DisplayName("TEST 2 - Inactive Policy -> R04 PASS, R03 FAIL, Status REJECTED")
+        void testInactivePolicy_TriggersR03Fail() {
+            Claim claim = createBaseClaim("CLM-R03-001");
+            claim.setPolicyNumber("POL-10002");
+            ExtractedClaimData data = createCleanExtractedData();
+            data.setPolicyNumber("POL-10002");
+            data.setAdmissionDate(LocalDate.of(2026, 4, 10));
+
+            Policy inactivePolicy = new Policy(
+                    "POL-10002",
+                    "Health Secure",
+                    "Test User",
+                    "Star Insurance",
+                    LocalDate.of(2026, 1, 1),
+                    LocalDate.of(2026, 3, 31),
+                    new BigDecimal("100000.00"),
+                    "INACTIVE"
+            );
+
+            List<RuleEvaluationResult> results = ruleEngineService.evaluateAllRules(claim, data, inactivePolicy);
+            decisionEngineService.applyDecision(claim, results);
+
+            assertEquals(ClaimStatus.REJECTED, claim.getStatus());
+            assertTrue(claim.getRuleResults().stream().anyMatch(r -> "R04".equals(r.getRuleCode()) && r.isPassed()));
+            assertTrue(claim.getRuleResults().stream().anyMatch(r -> "R03".equals(r.getRuleCode()) && !r.isPassed()));
         }
     }
 }

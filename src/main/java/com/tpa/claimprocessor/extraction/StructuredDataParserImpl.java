@@ -54,10 +54,7 @@ public class StructuredDataParserImpl implements StructuredDataParser {
         String fullText = formText + "\n" + combinedText;
 
         // 1. Policy Number
-        String policyNo = extractField(formText, "(?i)Policy\\s*(?:Number|No|#|Num)\\s*[:\\|\\-]?\\s*([A-Za-z0-9\\-]{3,30})");
-        if (policyNo == null) {
-            policyNo = extractField(fullText, "(?i)\\b(POL-[A-Za-z0-9\\-]+)\\b");
-        }
+        String policyNo = extractField(formText, "(?i)Policy\\s*(?:Number|No|#|Num)(?!\\s*ID)\\s*[:\\|\\-]?\\s*([A-Za-z0-9\\-]{3,30})");
         data.setPolicyNumber(cleanPolicyNumber(policyNo));
 
         // 2. Policy ID
@@ -271,7 +268,7 @@ public class StructuredDataParserImpl implements StructuredDataParser {
 
         if (upper.equals("DETAILS") || upper.equals("POLICY") || upper.equals("N/A")
                 || upper.equals("UNKNOWN") || upper.equals("NONE") || upper.equals("NULL")
-                || upper.startsWith("DETAILS")) {
+                || upper.startsWith("DETAILS") || upper.startsWith("PID-") || upper.equals("PID")) {
             return null;
         }
         return cleaned;

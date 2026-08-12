@@ -22,7 +22,7 @@ public class R04_PolicyNumberMissingRule implements RuleHandler {
 
         if (!isValidPolicyNumber(policyNo)) {
             return RuleEvaluationResult.fail("R04", "Policy Number Missing Check", RuleSeverity.NEEDS_MANUAL_REVIEW,
-                    "Extracted Policy Number is missing, unparseable, or invalid (" + (policyNo != null ? policyNo : "N/A") + ").");
+                    "Policy Number was not found in the uploaded Claim Form.");
         }
 
         return RuleEvaluationResult.pass("R04", "Policy Number Missing Check", "Policy Number extracted successfully (" + policyNo + ").");
@@ -37,7 +37,7 @@ public class R04_PolicyNumberMissingRule implements RuleHandler {
 
         if (upper.equals("DETAILS") || upper.equals("POLICY") || upper.equals("N/A")
                 || upper.equals("UNKNOWN") || upper.equals("NONE") || upper.equals("NULL")
-                || upper.startsWith("DETAILS")) {
+                || upper.startsWith("DETAILS") || upper.startsWith("PID-") || upper.equals("PID")) {
             return false;
         }
 

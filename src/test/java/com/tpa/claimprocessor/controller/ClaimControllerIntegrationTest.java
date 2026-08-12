@@ -1,6 +1,7 @@
 package com.tpa.claimprocessor.controller;
 
 import com.tpa.claimprocessor.domain.entity.Policy;
+import com.tpa.claimprocessor.domain.repository.ClaimRepository;
 import com.tpa.claimprocessor.domain.repository.PolicyRepository;
 import com.tpa.claimprocessor.util.PdfFixtureGenerator;
 import org.junit.jupiter.api.BeforeEach;
@@ -28,10 +29,14 @@ class ClaimControllerIntegrationTest {
     private MockMvc mockMvc;
 
     @Autowired
+    private ClaimRepository claimRepository;
+
+    @Autowired
     private PolicyRepository policyRepository;
 
     @BeforeEach
     void setUp() {
+        claimRepository.deleteAll();
         if (policyRepository.findByPolicyNumber("POL-2026-8899").isEmpty()) {
             Policy policy = new Policy(
                     "POL-2026-8899",

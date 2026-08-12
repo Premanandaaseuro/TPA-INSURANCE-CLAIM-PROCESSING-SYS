@@ -26,22 +26,60 @@ public class RuleEngineServiceImpl implements RuleEngineService {
     public List<RuleEvaluationResult> evaluateAllRules(Claim claim, ExtractedClaimData extractedData, Policy policy) {
         List<RuleEvaluationResult> results = new ArrayList<>();
 
-        for (RuleHandler handler : ruleHandlers) {
-            RuleEvaluationResult result = handler.evaluate(claim, extractedData, policy);
-            results.add(result);
+        RuleHandler r01 = getHandler("R01");
+        RuleHandler r02 = getHandler("R02");
+        RuleHandler r03 = getHandler("R03");
+        RuleHandler r04 = getHandler("R04");
+        RuleHandler r05 = getHandler("R05");
+        RuleHandler r06 = getHandler("R06");
+        RuleHandler r07 = getHandler("R07");
+        RuleHandler r08 = getHandler("R08");
+        RuleHandler r09 = getHandler("R09");
+        RuleHandler r10 = getHandler("R10");
 
-            // Create and persist entity result attached to Claim
-            ClaimRuleResult entityResult = new ClaimRuleResult(
-                    claim,
-                    result.getRuleCode(),
-                    result.getRuleName(),
-                    result.isPassed(),
-                    result.getSeverity(),
-                    result.getDetails()
-            );
-            claim.addRuleResult(entityResult);
+        if (r01 != null) executeAndRecord(r01, claim, extractedData, policy, results);
+        if (r02 != null) executeAndRecord(r02, claim, extractedData, policy, results);
+
+        RuleEvaluationResult r04Result = null;
+        if (r04 != null) {
+            r04Result = executeAndRecord(r04, claim, extractedData, policy, results);
         }
 
+        // ONLY execute R03 if R04 passed!
+        if (r04Result != null && r04Result.isPassed() && r03 != null) {
+            executeAndRecord(r03, claim, extractedData, policy, results);
+        }
+
+        if (r05 != null) executeAndRecord(r05, claim, extractedData, policy, results);
+        if (r06 != null) executeAndRecord(r06, claim, extractedData, policy, results);
+        if (r07 != null) executeAndRecord(r07, claim, extractedData, policy, results);
+        if (r08 != null) executeAndRecord(r08, claim, extractedData, policy, results);
+        if (r09 != null) executeAndRecord(r09, claim, extractedData, policy, results);
+        if (r10 != null) executeAndRecord(r10, claim, extractedData, policy, results);
+
         return results;
+    }
+
+    private RuleHandler getHandler(String ruleCode) {
+        return ruleHandlers.stream()
+                .filter(h -> ruleCode.equals(h.getRuleCode()))
+                .findFirst()
+                .orElse(null);
+    }
+
+    private RuleEvaluationResult executeAndRecord(RuleHandler handler, Claim claim, ExtractedClaimData extractedData, Policy policy, List<RuleEvaluationResult> results) {
+        RuleEvaluationResult result = handler.evaluate(claim, extractedData, policy);
+        results.add(result);
+
+        ClaimRuleResult entityResult = new ClaimRuleResult(
+                claim,
+                result.getRuleCode(),
+                result.getRuleName(),
+                result.isPassed(),
+                result.getSeverity(),
+                result.getDetails()
+        );
+        claim.addRuleResult(entityResult);
+        return result;
     }
 }

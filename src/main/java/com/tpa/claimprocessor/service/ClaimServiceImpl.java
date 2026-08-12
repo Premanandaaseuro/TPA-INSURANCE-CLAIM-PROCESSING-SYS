@@ -186,9 +186,9 @@ public class ClaimServiceImpl implements ClaimService {
             log.error("Failed to serialize extracted data to JSON for claim {}", claimId, e);
         }
 
-        // 11. Query Policy Database
+        // 11. Query Policy Database (ONLY if R04 policy number is validly extracted from Claim Form)
         Policy policy = null;
-        if (extractedData.getPolicyNumber() != null) {
+        if (com.tpa.claimprocessor.rules.handler.impl.R04_PolicyNumberMissingRule.isValidPolicyNumber(extractedData.getPolicyNumber())) {
             Optional<Policy> policyOpt = policyRepository.findByPolicyNumber(extractedData.getPolicyNumber());
             if (policyOpt.isPresent()) {
                 policy = policyOpt.get();
