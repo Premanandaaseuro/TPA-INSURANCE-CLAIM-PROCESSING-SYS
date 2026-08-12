@@ -54,4 +54,31 @@ public class ClaimController {
         claimService.clearAllClaimData();
         return ResponseEntity.ok(java.util.Map.of("message", "All claim test data cleared successfully."));
     }
+
+    @GetMapping("/{claimId}/debug")
+    public ResponseEntity<java.util.Map<String, Object>> getClaimDebugDetails(@PathVariable("claimId") String claimId) {
+        ClaimResponseDto claim = claimService.getClaimByClaimId(claimId);
+        java.util.Map<String, Object> debugInfo = new java.util.LinkedHashMap<>();
+        debugInfo.put("claimId", claim.getClaimId());
+        debugInfo.put("claimNumber", claim.getClaimNumber());
+        debugInfo.put("status", claim.getStatus());
+        debugInfo.put("decisionReason", claim.getDecisionReason());
+
+        java.util.Map<String, Object> extractedFields = new java.util.LinkedHashMap<>();
+        extractedFields.put("patientName", claim.getPatientName());
+        extractedFields.put("hospitalName", claim.getHospitalName());
+        extractedFields.put("policyNumber", claim.getPolicyNumber());
+        extractedFields.put("admissionDate", claim.getAdmissionDate());
+        extractedFields.put("dischargeDate", claim.getDischargeDate());
+        extractedFields.put("claimedAmount", claim.getClaimedAmount());
+        debugInfo.put("extractedFields", extractedFields);
+
+        java.util.Map<String, Object> normalizedFields = new java.util.LinkedHashMap<>();
+        normalizedFields.put("patientNameNormalized", claim.getPatientName() != null ? claim.getPatientName().trim().toLowerCase() : null);
+        normalizedFields.put("hospitalNameNormalized", claim.getHospitalName() != null ? claim.getHospitalName().trim().toLowerCase() : null);
+        debugInfo.put("normalizedFields", normalizedFields);
+
+        debugInfo.put("ruleResults", claim.getRuleResults());
+        return ResponseEntity.ok(debugInfo);
+    }
 }

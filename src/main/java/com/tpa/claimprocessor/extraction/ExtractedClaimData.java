@@ -282,4 +282,45 @@ public class ExtractedClaimData {
     public void setDischargeSummaryDischargeDate(LocalDate dischargeSummaryDischargeDate) {
         this.dischargeSummaryDischargeDate = dischargeSummaryDischargeDate;
     }
+
+    public static class ExtractedFieldMetadata {
+        private String fieldName;
+        private String value;
+        private String sourceDocument;
+        private int pageNumber = 1;
+        private double confidence = 0.95;
+
+        public ExtractedFieldMetadata() {}
+
+        public ExtractedFieldMetadata(String fieldName, String value, String sourceDocument, int pageNumber, double confidence) {
+            this.fieldName = fieldName;
+            this.value = value;
+            this.sourceDocument = sourceDocument;
+            this.pageNumber = pageNumber;
+            this.confidence = confidence;
+        }
+
+        public String getFieldName() { return fieldName; }
+        public void setFieldName(String fieldName) { this.fieldName = fieldName; }
+        public String getValue() { return value; }
+        public void setValue(String value) { this.value = value; }
+        public String getSourceDocument() { return sourceDocument; }
+        public void setSourceDocument(String sourceDocument) { this.sourceDocument = sourceDocument; }
+        public int getPageNumber() { return pageNumber; }
+        public void setPageNumber(int pageNumber) { this.pageNumber = pageNumber; }
+        public double getConfidence() { return confidence; }
+        public void setConfidence(double confidence) { this.confidence = confidence; }
+    }
+
+    private java.util.List<ExtractedFieldMetadata> fieldMetadataList = new java.util.ArrayList<>();
+
+    public java.util.List<ExtractedFieldMetadata> getFieldMetadataList() {
+        return fieldMetadataList;
+    }
+
+    public void addFieldMetadata(String fieldName, String value, String sourceDocument, int pageNumber, double confidence) {
+        if (value != null && !value.trim().isEmpty()) {
+            this.fieldMetadataList.add(new ExtractedFieldMetadata(fieldName, value, sourceDocument, pageNumber, confidence));
+        }
+    }
 }

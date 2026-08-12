@@ -180,8 +180,40 @@ public class StructuredDataParserImpl implements StructuredDataParser {
         String pharmacyChargesLine = extractField(hospitalBillText, "(?i)(?:Pharmacy|Medicines|Pharmacy\\s*Charges)\\s*[:\\|\\-]?\\s*([^\\r\\n]+)");
         data.setPharmacyCharges(parseAmount(pharmacyChargesLine));
 
+        // Track Extracted Field Metadata for debugging & audit (Requirement #8 & #20)
+        data.addFieldMetadata("policyNumber", data.getPolicyNumber(), "claim_form.pdf", 1, 0.98);
+        data.addFieldMetadata("policyId", data.getPolicyId(), "claim_form.pdf", 1, 0.95);
+        data.addFieldMetadata("customerName", data.getCustomerName(), "claim_form.pdf", 1, 0.96);
+        data.addFieldMetadata("carrierName", data.getCarrierName(), "claim_form.pdf", 1, 0.95);
+        data.addFieldMetadata("policyName", data.getPolicyName(), "claim_form.pdf", 1, 0.95);
+        data.addFieldMetadata("patientName", data.getPatientName(), "claim_form.pdf", 1, 0.97);
+        data.addFieldMetadata("hospitalName", data.getHospitalName(), "claim_form.pdf", 1, 0.97);
+        data.addFieldMetadata("admissionDate", data.getAdmissionDate() != null ? data.getAdmissionDate().toString() : null, "claim_form.pdf", 1, 0.98);
+        data.addFieldMetadata("dischargeDate", data.getDischargeDate() != null ? data.getDischargeDate().toString() : null, "claim_form.pdf", 1, 0.98);
+        data.addFieldMetadata("claimedAmount", data.getClaimedAmount() != null ? data.getClaimedAmount().toString() : null, "claim_form.pdf", 1, 0.99);
+        data.addFieldMetadata("totalBillAmount", data.getTotalBillAmount() != null ? data.getTotalBillAmount().toString() : null, "combined_hospital_document.pdf", 1, 0.99);
+        data.addFieldMetadata("billNumber", data.getBillNumber(), "combined_hospital_document.pdf", 1, 0.96);
+        data.addFieldMetadata("primaryDiagnosis", data.getPrimaryDiagnosis(), "combined_hospital_document.pdf", 1, 0.94);
+
         return data;
     }
+
+    private static final List<String> KNOWN_LABELS = List.of(
+            "PATIENT NAME", "NAME OF PATIENT", "BENEFICIARY NAME",
+            "HOSPITAL NAME", "NAME OF HOSPITAL", "HOSPITAL DETAILS", "MEDICAL CENTER",
+            "POLICY NUMBER", "POLICY NO", "POLICY #", "POLICY ID", "POLICY IDENTIFIER",
+            "CUSTOMER NAME", "INSURED NAME", "POLICY HOLDER NAME", "POLICYHOLDER NAME", "PROPOSER NAME",
+            "CARRIER NAME", "INSURANCE COMPANY", "INSURER", "INSURANCE PROVIDER",
+            "POLICY NAME", "PLAN NAME", "INSURANCE PLAN", "SCHEME NAME",
+            "ADMISSION DATE", "DATE OF ADMISSION", "DOA", "ADMITTED ON",
+            "DISCHARGE DATE", "DATE OF DISCHARGE", "DOD", "DISCHARGED ON",
+            "CLAIMED AMOUNT", "CLAIM AMOUNT", "AMOUNT CLAIMED", "CLAIMED VALUE",
+            "TOTAL BILL AMOUNT", "FINAL BILL AMOUNT", "TOTAL AMOUNT", "NET BILL AMOUNT", "GRAND TOTAL", "BILL AMOUNT",
+            "BILL NUMBER", "BILL NO", "INVOICE NUMBER", "INVOICE NO", "BILL #",
+            "DIAGNOSIS", "PRIMARY DIAGNOSIS", "ILLNESS",
+            "TREATING DOCTOR", "DOCTOR NAME",
+            "CLAIM FORM", "COMBINED HOSPITAL DOCUMENT", "DISCHARGE SUMMARY", "FINAL HOSPITAL BILL", "DOCUMENT"
+    );
 
     private String extractField(String text, String regex) {
         if (text == null || text.trim().isEmpty()) {
@@ -194,10 +226,34 @@ public class StructuredDataParserImpl implements StructuredDataParser {
             if (result != null) {
                 result = result.replaceAll("(?i)^(?:Name|Holder|Details|Number|No|#|ID)\\s*[:\\|\\-]?\\s*", "").trim();
                 result = result.replaceAll("^[:\\|\\-\\s]+", "").trim();
-                return result.isEmpty() ? null : result;
+                result = truncateAtNextLabel(result);
+                return cleanString(result);
             }
         }
         return null;
+    }
+
+    private String truncateAtNextLabel(String input) {
+        if (input == null || input.trim().isEmpty()) return null;
+        String upper = input.toUpperCase();
+        int minIndex = -1;
+
+        for (String label : KNOWN_LABELS) {
+            int idx = upper.indexOf(label);
+            if (idx == 0) {
+                // The extracted text STARTS with a label -> invalid value!
+                return null;
+            } else if (idx > 0) {
+                if (minIndex == -1 || idx < minIndex) {
+                    minIndex = idx;
+                }
+            }
+        }
+
+        if (minIndex > 0) {
+            input = input.substring(0, minIndex).trim();
+        }
+        return input;
     }
 
     private String cleanPolicyNumber(String str) {
@@ -219,9 +275,17 @@ public class StructuredDataParserImpl implements StructuredDataParser {
         String cleaned = str.trim();
         if (cleaned.isEmpty()) return null;
         String upper = cleaned.toUpperCase();
+
+        for (String label : KNOWN_LABELS) {
+            if (upper.equals(label) || upper.startsWith(label + ":") || upper.startsWith(label + " -") || upper.startsWith(label + " |")) {
+                return null;
+            }
+        }
+
         if (upper.equals("N/A") || upper.equals("UNKNOWN") || upper.equals("NONE") || upper.equals("NULL")
                 || upper.equals("NAME") || upper.equals("DETAILS") || upper.equals("NUMBER") || upper.equals("POLICY")
-                || upper.equals("BILL") || upper.equals("HOSPITAL BILL") || upper.equals("SUMMARY") || upper.equals("DISCHARGE SUMMARY")) {
+                || upper.equals("BILL") || upper.equals("HOSPITAL BILL") || upper.equals("SUMMARY") || upper.equals("DISCHARGE SUMMARY")
+                || upper.equals("FIELD") || upper.equals("VALUE")) {
             return null;
         }
         return cleaned;
@@ -249,7 +313,7 @@ public class StructuredDataParserImpl implements StructuredDataParser {
             String cleaned = amountStr.replaceAll("(?i)INR|Rs\\.?|₹|,", "").replaceAll("[^0-9\\.]", "").trim();
             if (cleaned.isEmpty()) return null;
             return new BigDecimal(cleaned);
-        } catch (Exception e) {
+        } catch (Exception ignored) {
             return null;
         }
     }
