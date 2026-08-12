@@ -24,7 +24,7 @@ interface ClaimDetailsViewProps {
 }
 
 export const ClaimDetailsView: React.FC<ClaimDetailsViewProps> = ({ claim, onBack }) => {
-  const exportUrl = getExportPdfUrl(claim.claimId);
+  const exportUrl = getExportPdfUrl(String(claim.claimNumber || claim.claimId));
 
   return (
     <div className="space-y-6">
@@ -63,7 +63,7 @@ export const ClaimDetailsView: React.FC<ClaimDetailsViewProps> = ({ claim, onBac
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-slate-100">
           <div>
             <div className="flex items-center gap-3 flex-wrap">
-              <h2 className="text-2xl font-black text-slate-900 tracking-tight">{claim.claimId}</h2>
+              <h2 className="text-2xl font-black text-slate-900 tracking-tight">{claim.claimNumber || claim.claimId}</h2>
               <StatusBadge status={claim.status} size="lg" />
             </div>
             <p className="text-xs text-slate-500 mt-1">

@@ -149,12 +149,12 @@ export const ClaimsDashboard: React.FC<ClaimsDashboardProps> = ({
               <tbody className="divide-y divide-slate-100 text-xs">
                 {filteredClaims.map((claim) => (
                   <tr
-                    key={claim.claimId}
+                    key={String(claim.claimNumber || claim.claimId)}
                     className="hover:bg-slate-50/60 transition-colors group cursor-pointer"
-                    onClick={() => onSelectClaim(claim.claimId)}
+                    onClick={() => onSelectClaim(String(claim.claimNumber || claim.claimId))}
                   >
                     <td className="py-3.5 px-4 font-bold text-sky-600 group-hover:underline">
-                      {claim.claimId}
+                      {claim.claimNumber || claim.claimId}
                     </td>
                     <td className="py-3.5 px-4">
                       <div className="font-semibold text-slate-900">{claim.patientName || 'N/A'}</div>

@@ -24,6 +24,7 @@ CREATE TABLE IF NOT EXISTS policies (
 CREATE TABLE IF NOT EXISTS claims (
     id BIGSERIAL PRIMARY KEY,
     claim_id VARCHAR(100) NOT NULL UNIQUE,
+    claim_number VARCHAR(100),
     policy_number VARCHAR(100),
     policy_id VARCHAR(100),
     customer_name VARCHAR(255),

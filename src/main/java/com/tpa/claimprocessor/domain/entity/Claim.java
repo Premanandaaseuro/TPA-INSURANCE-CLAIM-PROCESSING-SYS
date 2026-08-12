@@ -23,6 +23,9 @@ public class Claim {
     @Column(name = "claim_id", nullable = false, unique = true)
     private String claimId;
 
+    @Column(name = "claim_number")
+    private String claimNumber;
+
     @Column(name = "policy_number")
     private String policyNumber;
 
@@ -123,6 +126,14 @@ public class Claim {
 
     public void setClaimId(String claimId) {
         this.claimId = claimId;
+    }
+
+    public String getClaimNumber() {
+        return claimNumber != null ? claimNumber : claimId;
+    }
+
+    public void setClaimNumber(String claimNumber) {
+        this.claimNumber = claimNumber;
     }
 
     public String getPolicyNumber() {

@@ -12,6 +12,7 @@ public class ClaimResponseDto {
 
     private Long id;
     private String claimId;
+    private String claimNumber;
     private String policyNumber;
     private String policyId;
     private String customerName;
@@ -47,6 +48,14 @@ public class ClaimResponseDto {
 
     public void setClaimId(String claimId) {
         this.claimId = claimId;
+    }
+
+    public String getClaimNumber() {
+        return claimNumber != null ? claimNumber : claimId;
+    }
+
+    public void setClaimNumber(String claimNumber) {
+        this.claimNumber = claimNumber;
     }
 
     public String getPolicyNumber() {

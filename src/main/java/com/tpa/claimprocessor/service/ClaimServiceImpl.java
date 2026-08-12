@@ -86,6 +86,7 @@ public class ClaimServiceImpl implements ClaimService {
 
         // 3. Create Claim aggregate
         Claim claim = new Claim(claimId);
+        claim.setClaimNumber(claimId);
         claim.setStatus(ClaimStatus.PENDING);
         claim.setClaimType(ClaimType.REIMBURSEMENT);
 
@@ -238,6 +239,7 @@ public class ClaimServiceImpl implements ClaimService {
         ClaimResponseDto dto = new ClaimResponseDto();
         dto.setId(claim.getId());
         dto.setClaimId(claim.getClaimId());
+        dto.setClaimNumber(claim.getClaimNumber() != null ? claim.getClaimNumber() : claim.getClaimId());
         dto.setPolicyNumber(claim.getPolicyNumber());
         dto.setPolicyId(claim.getPolicyId());
         dto.setCustomerName(claim.getCustomerName());
