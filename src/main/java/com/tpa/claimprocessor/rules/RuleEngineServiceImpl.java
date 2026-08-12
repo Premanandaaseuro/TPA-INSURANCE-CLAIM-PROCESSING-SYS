@@ -20,7 +20,6 @@ public class RuleEngineServiceImpl implements RuleEngineService {
     private final List<RuleHandler> ruleHandlers;
 
     public RuleEngineServiceImpl(List<RuleHandler> ruleHandlers) {
-        // Sort handlers sequentially R01..R10
         List<RuleHandler> sorted = new ArrayList<>(ruleHandlers);
         sorted.sort(Comparator.comparing(RuleHandler::getRuleCode));
         this.ruleHandlers = sorted;
@@ -55,6 +54,23 @@ public class RuleEngineServiceImpl implements RuleEngineService {
 
         if (executingR03) {
             executeAndRecord(r03, claim, extractedData, policy, results);
+        } else {
+            RuleEvaluationResult r03NotEval = RuleEvaluationResult.notEvaluated(
+                    "R03",
+                    "Policy Inactive Check",
+                    "Policy inactive check was not evaluated because the Policy Number was missing from the uploaded Claim Form."
+            );
+            results.add(r03NotEval);
+            ClaimRuleResult entityResult = new ClaimRuleResult(
+                    claim,
+                    r03NotEval.getRuleCode(),
+                    r03NotEval.getRuleName(),
+                    r03NotEval.isPassed(),
+                    r03NotEval.getStatus(),
+                    r03NotEval.getSeverity(),
+                    r03NotEval.getDetails()
+            );
+            claim.addRuleResult(entityResult);
         }
 
         if (r05 != null) executeAndRecord(r05, claim, extractedData, policy, results);
@@ -64,6 +80,7 @@ public class RuleEngineServiceImpl implements RuleEngineService {
         if (r09 != null) executeAndRecord(r09, claim, extractedData, policy, results);
         if (r10 != null) executeAndRecord(r10, claim, extractedData, policy, results);
 
+        results.sort(Comparator.comparing(RuleEvaluationResult::getRuleCode));
         return results;
     }
 
@@ -83,6 +100,7 @@ public class RuleEngineServiceImpl implements RuleEngineService {
                 result.getRuleCode(),
                 result.getRuleName(),
                 result.isPassed(),
+                result.getStatus(),
                 result.getSeverity(),
                 result.getDetails()
         );

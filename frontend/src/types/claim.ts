@@ -1,6 +1,7 @@
 export type ClaimStatus = 'PENDING' | 'APPROVED' | 'REJECTED' | 'NEEDS_MANUAL_REVIEW';
 export type DocumentType = 'CLAIM_FORM' | 'COMBINED_HOSPITAL_DOCUMENT';
 export type RuleSeverity = 'REJECTED' | 'NEEDS_MANUAL_REVIEW';
+export type RuleStatus = 'PASS' | 'FAIL' | 'NOT_EVALUATED';
 
 export interface ClaimDocumentDto {
   id: number;
@@ -19,6 +20,7 @@ export interface ClaimRuleResultDto {
   ruleCode: string;
   ruleName: string;
   passed: boolean;
+  status?: RuleStatus;
   severity?: RuleSeverity;
   details?: string;
   evaluatedAt: string;

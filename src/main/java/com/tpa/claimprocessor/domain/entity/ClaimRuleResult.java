@@ -2,6 +2,7 @@ package com.tpa.claimprocessor.domain.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.tpa.claimprocessor.domain.enums.RuleSeverity;
+import com.tpa.claimprocessor.domain.enums.RuleStatus;
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
 
@@ -28,6 +29,10 @@ public class ClaimRuleResult {
     private boolean passed;
 
     @Enumerated(EnumType.STRING)
+    @Column(name = "status")
+    private RuleStatus status;
+
+    @Enumerated(EnumType.STRING)
     @Column(name = "severity")
     private RuleSeverity severity;
 
@@ -46,6 +51,18 @@ public class ClaimRuleResult {
         this.ruleCode = ruleCode;
         this.ruleName = ruleName;
         this.passed = passed;
+        this.status = passed ? RuleStatus.PASS : RuleStatus.FAIL;
+        this.severity = severity;
+        this.details = details;
+        this.evaluatedAt = LocalDateTime.now();
+    }
+
+    public ClaimRuleResult(Claim claim, String ruleCode, String ruleName, boolean passed, RuleStatus status, RuleSeverity severity, String details) {
+        this.claim = claim;
+        this.ruleCode = ruleCode;
+        this.ruleName = ruleName;
+        this.passed = passed;
+        this.status = status;
         this.severity = severity;
         this.details = details;
         this.evaluatedAt = LocalDateTime.now();
@@ -89,6 +106,14 @@ public class ClaimRuleResult {
 
     public void setPassed(boolean passed) {
         this.passed = passed;
+    }
+
+    public RuleStatus getStatus() {
+        return status != null ? status : (passed ? RuleStatus.PASS : RuleStatus.FAIL);
+    }
+
+    public void setStatus(RuleStatus status) {
+        this.status = status;
     }
 
     public RuleSeverity getSeverity() {

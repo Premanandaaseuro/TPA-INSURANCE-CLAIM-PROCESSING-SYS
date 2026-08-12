@@ -285,6 +285,7 @@ public class ClaimServiceImpl implements ClaimService {
                             r.getRuleCode(),
                             r.getRuleName(),
                             r.isPassed(),
+                            r.getStatus(),
                             r.getSeverity(),
                             r.getDetails(),
                             r.getEvaluatedAt()

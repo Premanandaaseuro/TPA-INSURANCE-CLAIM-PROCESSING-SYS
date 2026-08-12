@@ -20,6 +20,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class PdfExportServiceImpl implements PdfExportService {
@@ -199,20 +200,26 @@ public class PdfExportServiceImpl implements PdfExportService {
 
                 List<ClaimRuleResult> results = claim.getRuleResults();
                 if (results != null && !results.isEmpty()) {
+                    results = results.stream()
+                            .sorted(java.util.Comparator.comparing(ClaimRuleResult::getRuleCode))
+                            .collect(Collectors.toList());
+
                     for (ClaimRuleResult res : results) {
                         if (y < 60) break;
 
-                        String passStr = res.isPassed() ? "PASS" : "FAIL";
-                        String sevStr = res.getSeverity() != null
-                                ? res.getSeverity().name().replace("NEEDS_MANUAL_REVIEW", "MANUAL_REVIEW")
-                                : "-";
+                        String passStr = res.getStatus() == com.tpa.claimprocessor.domain.enums.RuleStatus.NOT_EVALUATED
+                                ? "NOT_EVAL"
+                                : (res.isPassed() ? "PASS" : "FAIL");
+                        String sevStr = (res.getStatus() == com.tpa.claimprocessor.domain.enums.RuleStatus.NOT_EVALUATED || res.getSeverity() == null)
+                                ? "-"
+                                : res.getSeverity().name().replace("NEEDS_MANUAL_REVIEW", "MANUAL_REVIEW");
                         String msg = res.getDetails() != null ? res.getDetails() : "Evaluated successfully.";
                         if (msg.length() > 50) msg = msg.substring(0, 47) + "...";
                         String ruleName = res.getRuleName() != null && res.getRuleName().length() > 26
                                 ? res.getRuleName().substring(0, 23) + "..."
                                 : (res.getRuleName() != null ? res.getRuleName() : "");
 
-                        String row = String.format("%-7s  %-26s  %-6s  %-16s  %s",
+                        String row = String.format("%-7s  %-26s  %-8s  %-14s  %s",
                                 res.getRuleCode(), ruleName, passStr, sevStr, msg);
 
                         cs.beginText();

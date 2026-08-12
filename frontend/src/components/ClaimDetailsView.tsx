@@ -16,6 +16,7 @@ import {
   CheckCircle2,
   XCircle,
   AlertTriangle,
+  MinusCircle,
 } from 'lucide-react';
 
 interface ClaimDetailsViewProps {
@@ -150,7 +151,10 @@ export const ClaimDetailsView: React.FC<ClaimDetailsViewProps> = ({ claim, onBac
               </thead>
               <tbody className="divide-y divide-slate-100 text-xs">
                 {claim.ruleResults.map((rule) => {
-                  const rowBg = !rule.passed
+                  const isNotEvaluated = rule.status === 'NOT_EVALUATED';
+                  const rowBg = isNotEvaluated
+                    ? 'bg-slate-50/30'
+                    : !rule.passed
                     ? rule.severity === 'REJECTED'
                       ? 'bg-rose-50/40'
                       : 'bg-amber-50/40'
@@ -165,7 +169,12 @@ export const ClaimDetailsView: React.FC<ClaimDetailsViewProps> = ({ claim, onBac
                         {rule.ruleName}
                       </td>
                       <td className="py-3.5 px-4">
-                        {rule.passed ? (
+                        {isNotEvaluated ? (
+                          <span className="inline-flex items-center gap-1 text-slate-600 bg-slate-100 px-2.5 py-1 rounded-full text-[11px] font-bold border border-slate-300">
+                            <MinusCircle className="w-3.5 h-3.5 text-slate-500" />
+                            NOT_EVALUATED
+                          </span>
+                        ) : rule.passed ? (
                           <span className="inline-flex items-center gap-1 text-emerald-700 bg-emerald-50 px-2.5 py-1 rounded-full text-[11px] font-bold border border-emerald-200">
                             <CheckCircle2 className="w-3.5 h-3.5" />
                             PASS
@@ -183,9 +192,9 @@ export const ClaimDetailsView: React.FC<ClaimDetailsViewProps> = ({ claim, onBac
                         )}
                       </td>
                       <td className="py-3.5 px-4">
-                        {rule.severity === 'REJECTED' ? (
+                        {!isNotEvaluated && rule.severity === 'REJECTED' ? (
                           <span className="inline-block px-2 py-0.5 rounded text-[10px] font-bold bg-rose-100 text-rose-700 border border-rose-200">REJECTED</span>
-                        ) : rule.severity === 'NEEDS_MANUAL_REVIEW' ? (
+                        ) : !isNotEvaluated && rule.severity === 'NEEDS_MANUAL_REVIEW' ? (
                           <span className="inline-block px-2 py-0.5 rounded text-[10px] font-bold bg-amber-100 text-amber-700 border border-amber-200">MANUAL REVIEW</span>
                         ) : (
                           <span className="text-slate-400 font-medium text-[11px]">—</span>

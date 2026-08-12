@@ -357,13 +357,13 @@ class RuleEngineAuditTest {
             assertTrue(claim.getDecisionReason().contains("R04"), "Expected R04 in decision reason, but was: " + claim.getDecisionReason());
             assertTrue(claim.getDecisionReason().contains("R08"), "Expected R08 in decision reason, but was: " + claim.getDecisionReason());
             assertTrue(claim.getDecisionReason().contains("R10"), "Expected R10 in decision reason, but was: " + claim.getDecisionReason());
-            // R03 skipped because R04 failed -> 9 rule results recorded
-            assertEquals(9, claim.getRuleResults().size());
-            assertFalse(claim.getRuleResults().stream().anyMatch(r -> "R03".equals(r.getRuleCode())));
+            // All 10 rules recorded
+            assertEquals(10, claim.getRuleResults().size());
+            assertTrue(claim.getRuleResults().stream().anyMatch(r -> "R03".equals(r.getRuleCode()) && r.getStatus() == com.tpa.claimprocessor.domain.enums.RuleStatus.NOT_EVALUATED));
         }
 
         @Test
-        @DisplayName("TEST 1 - Missing Policy Number -> R04 FAIL, R03 SKIPPED, Status NEEDS_MANUAL_REVIEW")
+        @DisplayName("TEST 1 - Missing Policy Number -> R04 FAIL, R03 NOT_EVALUATED, Status NEEDS_MANUAL_REVIEW")
         void testMissingPolicyNumber_SkipsR03() {
             Claim claim = createBaseClaim("CLM-R04-001");
             claim.setPolicyNumber(null);
@@ -375,7 +375,7 @@ class RuleEngineAuditTest {
 
             assertEquals(ClaimStatus.NEEDS_MANUAL_REVIEW, claim.getStatus());
             assertTrue(claim.getRuleResults().stream().anyMatch(r -> "R04".equals(r.getRuleCode()) && !r.isPassed()));
-            assertFalse(claim.getRuleResults().stream().anyMatch(r -> "R03".equals(r.getRuleCode())));
+            assertTrue(claim.getRuleResults().stream().anyMatch(r -> "R03".equals(r.getRuleCode()) && r.getStatus() == com.tpa.claimprocessor.domain.enums.RuleStatus.NOT_EVALUATED));
         }
 
         @Test
