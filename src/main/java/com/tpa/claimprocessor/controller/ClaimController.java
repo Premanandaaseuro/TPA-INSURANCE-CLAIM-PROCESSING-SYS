@@ -42,4 +42,16 @@ public class ClaimController {
         ClaimResponseDto claim = claimService.getClaimByClaimId(claimId);
         return ResponseEntity.ok(claim);
     }
+
+    @PostMapping("/clear-test-data")
+    public ResponseEntity<java.util.Map<String, String>> clearAllClaimDataPost() {
+        claimService.clearAllClaimData();
+        return ResponseEntity.ok(java.util.Map.of("message", "All claim test data cleared successfully."));
+    }
+
+    @DeleteMapping("/clear-test-data")
+    public ResponseEntity<java.util.Map<String, String>> clearAllClaimDataDelete() {
+        claimService.clearAllClaimData();
+        return ResponseEntity.ok(java.util.Map.of("message", "All claim test data cleared successfully."));
+    }
 }

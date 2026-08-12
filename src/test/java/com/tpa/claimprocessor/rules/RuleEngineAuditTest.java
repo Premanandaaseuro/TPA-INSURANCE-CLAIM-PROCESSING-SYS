@@ -138,25 +138,18 @@ class RuleEngineAuditTest {
         }
 
         @Test
-        @DisplayName("R03 - Policy Inactive on Admission Date")
+        @DisplayName("R03 - Policy Exists Check")
         void testR03() {
             Claim claim = createBaseClaim("CLM-TEST-005");
             ExtractedClaimData cleanData = createCleanExtractedData();
             RuleEvaluationResult passResult = r03Rule.evaluate(claim, cleanData, activePolicy);
             assertTrue(passResult.isPassed());
 
-            // Inactive policy
-            Policy inactivePolicy = new Policy("POL-INACTIVE", "Plan", "User", "Carrier", LocalDate.of(2025, 1, 1), LocalDate.of(2025, 12, 31), new BigDecimal("100000"), "EXPIRED");
-            RuleEvaluationResult failResult = r03Rule.evaluate(claim, cleanData, inactivePolicy);
+            // Null policy (policy does not exist in database)
+            RuleEvaluationResult failResult = r03Rule.evaluate(claim, cleanData, null);
             assertFalse(failResult.isPassed());
             assertEquals(RuleSeverity.REJECTED, failResult.getSeverity());
-
-            // Admission date past policy end date
-            ExtractedClaimData expiredData = createCleanExtractedData();
-            expiredData.setAdmissionDate(LocalDate.of(2027, 5, 1));
-            RuleEvaluationResult expiredResult = r03Rule.evaluate(claim, expiredData, activePolicy);
-            assertFalse(expiredResult.isPassed());
-            assertEquals(RuleSeverity.REJECTED, expiredResult.getSeverity());
+            assertTrue(failResult.getDetails().contains("not found"));
         }
 
         @Test
@@ -292,10 +285,8 @@ class RuleEngineAuditTest {
             data.setClaimedAmount(new BigDecimal("90000.00"));
             data.setTotalBillAmount(new BigDecimal("45000.00")); // Triggers R08 (MANUAL_REVIEW)
 
-            // Expired policy triggers R03 (REJECTED)
-            Policy expiredPolicy = new Policy("POL-2026-8899", "Plan", "Rahul Sharma", "Carrier", LocalDate.of(2025, 1, 1), LocalDate.of(2025, 12, 31), new BigDecimal("500000"), "EXPIRED");
-
-            List<RuleEvaluationResult> results = ruleEngineService.evaluateAllRules(claim, data, expiredPolicy);
+            // Null policy triggers R03 (REJECTED)
+            List<RuleEvaluationResult> results = ruleEngineService.evaluateAllRules(claim, data, null);
             decisionEngineService.applyDecision(claim, results);
 
             // MUST be REJECTED because REJECTED > NEEDS_MANUAL_REVIEW

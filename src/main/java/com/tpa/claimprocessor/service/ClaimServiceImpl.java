@@ -20,6 +20,8 @@ import com.tpa.claimprocessor.extraction.PdfTextExtractorService;
 import com.tpa.claimprocessor.extraction.StructuredDataParser;
 import com.tpa.claimprocessor.rules.RuleEngineService;
 import com.tpa.claimprocessor.rules.RuleEvaluationResult;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -35,6 +37,9 @@ import java.util.stream.Collectors;
 public class ClaimServiceImpl implements ClaimService {
 
     private static final Logger log = LoggerFactory.getLogger(ClaimServiceImpl.class);
+
+    @PersistenceContext
+    private EntityManager entityManager;
 
     private final ClaimRepository claimRepository;
     private final PolicyRepository policyRepository;
@@ -219,6 +224,14 @@ public class ClaimServiceImpl implements ClaimService {
         Claim claim = claimRepository.findByClaimIdWithDetails(claimId)
                 .orElseThrow(() -> new ClaimNotFoundException("Claim not found with ID: " + claimId));
         return mapToResponseDto(claim);
+    }
+
+    @Override
+    @Transactional
+    public void clearAllClaimData() {
+        entityManager.createNativeQuery(
+                "TRUNCATE TABLE claim_rule_results, claim_jsons, claim_documents, discharge_details, hospital_bill_details, claims RESTART IDENTITY CASCADE"
+        ).executeUpdate();
     }
 
     private ClaimResponseDto mapToResponseDto(Claim claim) {

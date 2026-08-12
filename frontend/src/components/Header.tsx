@@ -1,11 +1,12 @@
 import React from 'react';
-import { ShieldCheck, PlusCircle, LayoutDashboard, RefreshCw } from 'lucide-react';
+import { ShieldCheck, PlusCircle, LayoutDashboard, RefreshCw, Trash2 } from 'lucide-react';
 
 interface HeaderProps {
   activeTab: 'dashboard' | 'details';
   onNewClaimClick: () => void;
   onDashboardClick: () => void;
   onRefreshClick: () => void;
+  onClearDataClick: () => void;
   isRefreshing?: boolean;
 }
 
@@ -14,6 +15,7 @@ export const Header: React.FC<HeaderProps> = ({
   onNewClaimClick,
   onDashboardClick,
   onRefreshClick,
+  onClearDataClick,
   isRefreshing,
 }) => {
   return (
@@ -35,6 +37,15 @@ export const Header: React.FC<HeaderProps> = ({
 
         {/* Action Controls */}
         <div className="flex items-center gap-3">
+          <button
+            onClick={onClearDataClick}
+            className="px-3 py-2 bg-rose-500/10 hover:bg-rose-500/20 text-rose-300 border border-rose-500/30 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-colors"
+            title="Clear All Claim Data"
+          >
+            <Trash2 className="w-3.5 h-3.5 text-rose-400" />
+            <span className="hidden sm:inline">Clear All Claim Data</span>
+          </button>
+
           <button
             onClick={onRefreshClick}
             disabled={isRefreshing}

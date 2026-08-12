@@ -43,3 +43,13 @@ export async function submitClaim(claimForm: File, combinedHospitalDocument: Fil
 export function getExportPdfUrl(claimId: string): string {
   return `${API_BASE_URL}/${claimId}/pdf`;
 }
+
+export async function clearAllClaimData(): Promise<{ message: string }> {
+  const response = await fetch(`${API_BASE_URL}/clear-test-data`, {
+    method: 'POST',
+  });
+  if (!response.ok) {
+    throw new Error(`Failed to clear claim test data (HTTP ${response.status})`);
+  }
+  return response.json();
+}

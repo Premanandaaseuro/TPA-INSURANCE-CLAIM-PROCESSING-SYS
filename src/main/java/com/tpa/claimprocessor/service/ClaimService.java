@@ -12,4 +12,6 @@ public interface ClaimService {
     List<ClaimResponseDto> getAllClaims();
 
     ClaimResponseDto getClaimByClaimId(String claimId);
+
+    void clearAllClaimData();
 }
