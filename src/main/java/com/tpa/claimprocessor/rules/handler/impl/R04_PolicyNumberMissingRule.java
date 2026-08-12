@@ -22,7 +22,7 @@ public class R04_PolicyNumberMissingRule implements RuleHandler {
 
         if (!isValidPolicyNumber(policyNo)) {
             return RuleEvaluationResult.fail("R04", "Policy Number Missing Check", RuleSeverity.NEEDS_MANUAL_REVIEW,
-                    "Policy Number was not found in the uploaded Claim Form.");
+                    "R04 – Policy Number is missing from the uploaded Claim Form.");
         }
 
         return RuleEvaluationResult.pass("R04", "Policy Number Missing Check", "Policy Number extracted successfully (" + policyNo + ").");
