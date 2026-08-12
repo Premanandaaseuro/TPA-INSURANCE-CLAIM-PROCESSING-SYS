@@ -25,7 +25,8 @@ public class R02_CombinedDocMissingRule implements RuleHandler {
         if (hasCombinedDoc) {
             return RuleEvaluationResult.pass("R02", "Combined Hospital Document Missing Check", "Combined Hospital Document attached and valid.");
         } else {
-            return RuleEvaluationResult.fail("R02", "Combined Hospital Document Missing Check", RuleSeverity.REJECTED, "Combined Discharge Summary and Hospital Bill PDF is missing or empty.");
+            return RuleEvaluationResult.fail("R02", "Combined Hospital Document Missing Check", RuleSeverity.REJECTED,
+                    "R02 – Combined Hospital Document is missing. The second document containing the Discharge Summary and Final Hospital Bill is required.");
         }
     }
 }

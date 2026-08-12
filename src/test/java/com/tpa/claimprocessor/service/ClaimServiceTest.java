@@ -123,18 +123,83 @@ class ClaimServiceTest {
     }
 
     @Test
-    void createClaim_MissingClaimForm_ThrowsException() {
-        InvalidDocumentException exception = assertThrows(InvalidDocumentException.class, () ->
-                claimService.createClaim(null, validCombinedDoc)
+    void createClaim_MissingClaimForm_TriggersR01Rejected() {
+        when(claimIdGeneratorService.generateNextClaimId()).thenReturn("CLM-2026-000002");
+        FileStorageService.StoredFileMetaData combinedMeta = new FileStorageService.StoredFileMetaData(
+                "combined.pdf", "combined_document.pdf", "target/test-storage/combined_document.pdf", "application/pdf", 200L, "hash2"
         );
-        assertTrue(exception.getMessage().contains("Claim Form PDF is missing"));
+        when(fileStorageService.storeFile(eq("CLM-2026-000002"), eq(DocumentType.COMBINED_HOSPITAL_DOCUMENT), any(MultipartFile.class)))
+                .thenReturn(combinedMeta);
+        when(pdfTextExtractorService.extractText(any(File.class))).thenReturn("Sample Raw Text");
+        when(structuredDataParser.parse(anyString(), anyString())).thenReturn(new ExtractedClaimData());
+
+        com.tpa.claimprocessor.rules.RuleEvaluationResult r01Fail = com.tpa.claimprocessor.rules.RuleEvaluationResult.fail(
+                "R01", "Claim Form Missing Check", com.tpa.claimprocessor.domain.enums.RuleSeverity.REJECTED, "R01 – Claim Form is missing."
+        );
+        when(ruleEngineService.evaluateAllRules(any(), any(), any())).thenReturn(java.util.List.of(r01Fail));
+
+        doAnswer(invocation -> {
+            Claim c = invocation.getArgument(0);
+            c.setStatus(ClaimStatus.REJECTED);
+            c.setDecisionReason("R01 – Claim Form is missing.");
+            return null;
+        }).when(decisionEngineService).applyDecision(any(), any());
+
+        when(claimRepository.save(any(Claim.class))).thenAnswer(invocation -> invocation.getArgument(0));
+        when(claimRepository.findByClaimIdWithDetails(anyString())).thenAnswer(invocation -> {
+            Claim c = new Claim();
+            c.setClaimId("CLM-2026-000002");
+            c.setStatus(ClaimStatus.REJECTED);
+            c.setDecisionReason("R01 – Claim Form is missing.");
+            c.setDocuments(java.util.List.of());
+            return java.util.Optional.of(c);
+        });
+
+        ClaimResponseDto result = claimService.createClaim(null, validCombinedDoc);
+        assertNotNull(result);
+        assertEquals(ClaimStatus.REJECTED, result.getStatus());
     }
 
     @Test
-    void createClaim_MissingCombinedDoc_ThrowsException() {
-        InvalidDocumentException exception = assertThrows(InvalidDocumentException.class, () ->
-                claimService.createClaim(validClaimForm, null)
+    void createClaim_MissingCombinedDoc_TriggersR02Rejected() {
+        when(claimIdGeneratorService.generateNextClaimId()).thenReturn("CLM-2026-000003");
+        FileStorageService.StoredFileMetaData formMeta = new FileStorageService.StoredFileMetaData(
+                "claim_form.pdf", "claim_form.pdf", "target/test-storage/claim_form.pdf", "application/pdf", 100L, "hash1"
         );
-        assertTrue(exception.getMessage().contains("Combined Hospital Document PDF is missing"));
+        when(fileStorageService.storeFile(eq("CLM-2026-000003"), eq(DocumentType.CLAIM_FORM), any(MultipartFile.class)))
+                .thenReturn(formMeta);
+        when(pdfTextExtractorService.extractText(any(File.class))).thenReturn("Sample Raw Text");
+        when(structuredDataParser.parse(anyString(), anyString())).thenReturn(new ExtractedClaimData());
+
+        com.tpa.claimprocessor.rules.RuleEvaluationResult r02Fail = com.tpa.claimprocessor.rules.RuleEvaluationResult.fail(
+                "R02", "Combined Hospital Document Missing Check", com.tpa.claimprocessor.domain.enums.RuleSeverity.REJECTED, "R02 – Combined Hospital Document is missing."
+        );
+        when(ruleEngineService.evaluateAllRules(any(), any(), any())).thenReturn(java.util.List.of(r02Fail));
+
+        doAnswer(invocation -> {
+            Claim c = invocation.getArgument(0);
+            c.setStatus(ClaimStatus.REJECTED);
+            c.setDecisionReason("R02 – Combined Hospital Document is missing.");
+            return null;
+        }).when(decisionEngineService).applyDecision(any(), any());
+
+        when(claimRepository.save(any(Claim.class))).thenAnswer(invocation -> invocation.getArgument(0));
+        when(claimRepository.findByClaimIdWithDetails(anyString())).thenAnswer(invocation -> {
+            Claim c = new Claim();
+            c.setClaimId("CLM-2026-000003");
+            c.setStatus(ClaimStatus.REJECTED);
+            c.setDecisionReason("R02 – Combined Hospital Document is missing.");
+            c.setDocuments(java.util.List.of());
+            return java.util.Optional.of(c);
+        });
+
+        ClaimResponseDto result = claimService.createClaim(validClaimForm, null);
+        assertNotNull(result);
+        assertEquals(ClaimStatus.REJECTED, result.getStatus());
+    }
+
+    @Test
+    void createClaim_BothMissing_ThrowsException() {
+        assertThrows(InvalidDocumentException.class, () -> claimService.createClaim(null, null));
     }
 }

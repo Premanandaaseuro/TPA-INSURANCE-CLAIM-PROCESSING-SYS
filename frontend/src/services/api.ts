@@ -18,10 +18,14 @@ export async function fetchClaimByClaimId(claimId: string): Promise<ClaimRespons
   return response.json();
 }
 
-export async function submitClaim(claimForm: File, combinedHospitalDocument: File): Promise<ClaimResponseDto> {
+export async function submitClaim(claimForm: File | null, combinedHospitalDocument: File | null): Promise<ClaimResponseDto> {
   const formData = new FormData();
-  formData.append('claimForm', claimForm);
-  formData.append('combinedHospitalDocument', combinedHospitalDocument);
+  if (claimForm) {
+    formData.append('claimForm', claimForm);
+  }
+  if (combinedHospitalDocument) {
+    formData.append('combinedHospitalDocument', combinedHospitalDocument);
+  }
 
   const response = await fetch(API_BASE_URL, {
     method: 'POST',

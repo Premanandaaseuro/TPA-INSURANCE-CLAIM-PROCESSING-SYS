@@ -21,12 +21,8 @@ export const NewClaimModal: React.FC<NewClaimModalProps> = ({ isOpen, onClose, o
     e.preventDefault();
     setErrorMessage(null);
 
-    if (!claimFormFile) {
-      setErrorMessage('Claim Form PDF is required.');
-      return;
-    }
-    if (!combinedDocFile) {
-      setErrorMessage('Combined Hospital Document PDF is required.');
+    if (!claimFormFile && !combinedDocFile) {
+      setErrorMessage('At least one claim document is required to submit.');
       return;
     }
 
@@ -181,7 +177,7 @@ export const NewClaimModal: React.FC<NewClaimModalProps> = ({ isOpen, onClose, o
             </button>
             <button
               type="submit"
-              disabled={isSubmitting || !claimFormFile || !combinedDocFile}
+              disabled={isSubmitting || (!claimFormFile && !combinedDocFile)}
               className="px-5 py-2.5 bg-gradient-to-r from-sky-600 to-blue-600 hover:from-sky-700 hover:to-blue-700 disabled:opacity-50 text-white rounded-xl text-xs font-bold shadow-lg shadow-sky-500/25 flex items-center gap-2 transition-all"
             >
               {isSubmitting ? (

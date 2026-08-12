@@ -24,8 +24,8 @@ public class ClaimController {
 
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<ClaimResponseDto> createClaim(
-            @RequestPart("claimForm") MultipartFile claimForm,
-            @RequestPart("combinedHospitalDocument") MultipartFile combinedHospitalDocument) {
+            @RequestPart(value = "claimForm", required = false) MultipartFile claimForm,
+            @RequestPart(value = "combinedHospitalDocument", required = false) MultipartFile combinedHospitalDocument) {
 
         ClaimResponseDto createdClaim = claimService.createClaim(claimForm, combinedHospitalDocument);
         return new ResponseEntity<>(createdClaim, HttpStatus.CREATED);

@@ -119,7 +119,7 @@ class RuleEngineAuditTest {
             RuleEvaluationResult failResult = r01Rule.evaluate(claimNoDoc, createCleanExtractedData(), activePolicy);
             assertFalse(failResult.isPassed());
             assertEquals(RuleSeverity.REJECTED, failResult.getSeverity());
-            assertTrue(failResult.getDetails().contains("Claim Form PDF is missing"));
+            assertTrue(failResult.getDetails().contains("Claim Form is missing"));
         }
 
         @Test
@@ -134,7 +134,7 @@ class RuleEngineAuditTest {
             RuleEvaluationResult failResult = r02Rule.evaluate(claimNoCombined, createCleanExtractedData(), activePolicy);
             assertFalse(failResult.isPassed());
             assertEquals(RuleSeverity.REJECTED, failResult.getSeverity());
-            assertTrue(failResult.getDetails().contains("Combined Discharge Summary and Hospital Bill PDF is missing"));
+            assertTrue(failResult.getDetails().contains("Combined Hospital Document is missing"));
         }
 
         @Test

@@ -38,8 +38,14 @@ public class StructuredDataParserImpl implements StructuredDataParser {
         if (combinedText != null && !combinedText.isEmpty()) {
             Pattern billHeaderPattern = Pattern.compile("(?i)(?:FINAL\\s*HOSPITAL\\s*BILL|HOSPITAL\\s*BILL|BILL\\s*DETAILS|INVOICE)");
             Matcher billMatcher = billHeaderPattern.matcher(combinedText);
-            if (billMatcher.find()) {
-                int splitIndex = billMatcher.start();
+            int splitIndex = -1;
+            while (billMatcher.find()) {
+                if (billMatcher.start() > 50) {
+                    splitIndex = billMatcher.start();
+                    break;
+                }
+            }
+            if (splitIndex > 0) {
                 dischargeSummaryText = combinedText.substring(0, splitIndex);
                 hospitalBillText = combinedText.substring(splitIndex);
             }
@@ -62,9 +68,10 @@ public class StructuredDataParserImpl implements StructuredDataParser {
         data.setPolicyId(cleanString(policyId));
 
         // 3. Patient Name across sections
-        String cfPatient = extractField(formText, "(?i)(?:Patient\\s*Name|Name\\s*of\\s*Patient|Patient)\\s*[:\\|\\-]?\\s*([A-Za-z \\.\\'-]{2,50})");
-        String dsPatient = extractField(dischargeSummaryText, "(?i)(?:Patient\\s*Name|Name\\s*of\\s*Patient|Patient)\\s*[:\\|\\-]?\\s*([A-Za-z \\.\\'-]{2,50})");
-        String hbPatient = extractField(hospitalBillText, "(?i)(?:Patient\\s*Name|Name\\s*of\\s*Patient|Patient)\\s*[:\\|\\-]?\\s*([A-Za-z \\.\\'-]{2,50})");
+        String patientRegex = "(?i)(?:Patient\\s*Name|Name\\s*of\\s*Patient|Beneficiary\\s*Name|Patient(?!\\s*Name))\\s*[:\\|\\-]?\\s*([A-Za-z \\.\\'-]{2,50})";
+        String cfPatient = extractField(formText, patientRegex);
+        String dsPatient = extractField(dischargeSummaryText, patientRegex);
+        String hbPatient = extractField(hospitalBillText, patientRegex);
 
         data.setClaimFormPatientName(cleanString(cfPatient));
         data.setDischargeSummaryPatientName(cleanString(dsPatient));
@@ -73,11 +80,11 @@ public class StructuredDataParserImpl implements StructuredDataParser {
         String primaryPatient = cleanString(cfPatient);
         if (primaryPatient == null) primaryPatient = cleanString(dsPatient);
         if (primaryPatient == null) primaryPatient = cleanString(hbPatient);
-        if (primaryPatient == null) primaryPatient = extractField(fullText, "(?i)Patient\\s*[:\\|\\-]?\\s*([A-Za-z \\.\\'-]{2,50})");
+        if (primaryPatient == null) primaryPatient = extractField(fullText, patientRegex);
         data.setPatientName(cleanString(primaryPatient));
 
         // 4. Customer Name / Policy Holder
-        String customerName = extractField(formText, "(?i)(?:Customer\\s*Name|Policy\\s*Holder|Insured\\s*Name|Insured|Proposer\\s*Name)\\s*[:\\|\\-]?\\s*([A-Za-z \\.\\'-]{2,50})");
+        String customerName = extractField(formText, "(?i)(?:Customer\\s*Name|Policy\\s*Holder\\s*Name|Policy\\s*Holder|Insured\\s*Name|Insured|Proposer\\s*Name)\\s*[:\\|\\-]?\\s*([A-Za-z \\.\\'-]{2,50})");
         if (customerName == null) {
             customerName = data.getPatientName();
         }
@@ -98,7 +105,7 @@ public class StructuredDataParserImpl implements StructuredDataParser {
         data.setPolicyName(cleanString(policyName));
 
         // 7. Hospital Name across sections
-        String hospitalRegex = "(?i)(?:Hospital\\s*Name|Name\\s*of\\s*Hospital|Medical\\s*Center|Hospital(?!\\s*Bill))\\s*[:\\|\\-]?\\s*([A-Za-z0-9 \\,\\.\\'-]{3,60})";
+        String hospitalRegex = "(?i)(?:Hospital\\s*Name|Name\\s*of\\s*Hospital|Medical\\s*Center|Hospital(?!\\s*Name|\\s*Bill))\\s*[:\\|\\-]?\\s*([A-Za-z0-9 \\,\\.\\'-]{3,60})";
         String cfHospital = extractField(formText, hospitalRegex);
         String dsHospital = extractField(dischargeSummaryText, hospitalRegex);
         String hbHospital = extractField(hospitalBillText, hospitalRegex);

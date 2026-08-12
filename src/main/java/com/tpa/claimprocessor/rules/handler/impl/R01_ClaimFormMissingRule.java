@@ -26,7 +26,8 @@ public class R01_ClaimFormMissingRule implements RuleHandler {
         if (hasClaimForm) {
             return RuleEvaluationResult.pass("R01", "Claim Form Missing Check", "Claim Form attached and valid.");
         } else {
-            return RuleEvaluationResult.fail("R01", "Claim Form Missing Check", RuleSeverity.REJECTED, "Claim Form PDF is missing or empty.");
+            return RuleEvaluationResult.fail("R01", "Claim Form Missing Check", RuleSeverity.REJECTED,
+                    "R01 – Claim Form is missing. The first required document is missing.");
         }
     }
 }

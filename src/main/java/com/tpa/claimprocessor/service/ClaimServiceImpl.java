@@ -73,15 +73,14 @@ public class ClaimServiceImpl implements ClaimService {
     @Override
     @Transactional
     public ClaimResponseDto createClaim(MultipartFile claimForm, MultipartFile combinedHospitalDocument) {
-        // 1. Validate presence of both required documents
-        if (claimForm == null || claimForm.isEmpty()) {
-            throw new InvalidDocumentException("Claim Form PDF is missing or empty (R01 violation)");
-        }
-        if (combinedHospitalDocument == null || combinedHospitalDocument.isEmpty()) {
-            throw new InvalidDocumentException("Combined Hospital Document PDF is missing or empty (R02 violation)");
+        boolean hasForm = claimForm != null && !claimForm.isEmpty();
+        boolean hasCombined = combinedHospitalDocument != null && !combinedHospitalDocument.isEmpty();
+
+        if (!hasForm && !hasCombined) {
+            throw new InvalidDocumentException("At least one claim document must be uploaded.");
         }
 
-        // 2. Generate unique Claim ID (CLM-YYYY-XXXXXX)
+        // 2. Generate unique Claim ID (CLM-YYYY-000001)
         String claimId = claimIdGeneratorService.generateNextClaimId();
 
         // 3. Create Claim aggregate
@@ -90,42 +89,47 @@ public class ClaimServiceImpl implements ClaimService {
         claim.setStatus(ClaimStatus.PENDING);
         claim.setClaimType(ClaimType.REIMBURSEMENT);
 
+        String formRawText = "";
+        String combinedRawText = "";
+
         // 4. Store Files in storage/claims/{claimId}/
-        FileStorageService.StoredFileMetaData formMeta = fileStorageService.storeFile(
-                claimId, DocumentType.CLAIM_FORM, claimForm
-        );
-        ClaimDocument formDoc = new ClaimDocument(
-                claim,
-                DocumentType.CLAIM_FORM,
-                formMeta.originalFilename(),
-                formMeta.storedFilename(),
-                formMeta.filePath(),
-                formMeta.contentType(),
-                formMeta.fileSize(),
-                formMeta.checksumSha256()
-        );
-        claim.addDocument(formDoc);
+        if (hasForm) {
+            FileStorageService.StoredFileMetaData formMeta = fileStorageService.storeFile(
+                    claimId, DocumentType.CLAIM_FORM, claimForm
+            );
+            ClaimDocument formDoc = new ClaimDocument(
+                    claim,
+                    DocumentType.CLAIM_FORM,
+                    formMeta.originalFilename(),
+                    formMeta.storedFilename(),
+                    formMeta.filePath(),
+                    formMeta.contentType(),
+                    formMeta.fileSize(),
+                    formMeta.checksumSha256()
+            );
+            claim.addDocument(formDoc);
+            formRawText = pdfTextExtractorService.extractText(new File(formMeta.filePath()));
+        }
 
-        FileStorageService.StoredFileMetaData combinedMeta = fileStorageService.storeFile(
-                claimId, DocumentType.COMBINED_HOSPITAL_DOCUMENT, combinedHospitalDocument
-        );
-        ClaimDocument combinedDoc = new ClaimDocument(
-                claim,
-                DocumentType.COMBINED_HOSPITAL_DOCUMENT,
-                combinedMeta.originalFilename(),
-                combinedMeta.storedFilename(),
-                combinedMeta.filePath(),
-                combinedMeta.contentType(),
-                combinedMeta.fileSize(),
-                combinedMeta.checksumSha256()
-        );
-        claim.addDocument(combinedDoc);
+        if (hasCombined) {
+            FileStorageService.StoredFileMetaData combinedMeta = fileStorageService.storeFile(
+                    claimId, DocumentType.COMBINED_HOSPITAL_DOCUMENT, combinedHospitalDocument
+            );
+            ClaimDocument combinedDoc = new ClaimDocument(
+                    claim,
+                    DocumentType.COMBINED_HOSPITAL_DOCUMENT,
+                    combinedMeta.originalFilename(),
+                    combinedMeta.storedFilename(),
+                    combinedMeta.filePath(),
+                    combinedMeta.contentType(),
+                    combinedMeta.fileSize(),
+                    combinedMeta.checksumSha256()
+            );
+            claim.addDocument(combinedDoc);
+            combinedRawText = pdfTextExtractorService.extractText(new File(combinedMeta.filePath()));
+        }
 
-        // 5. Extract Text using PDFBox / Tess4J OCR
-        String formRawText = pdfTextExtractorService.extractText(new File(formMeta.filePath()));
-        String combinedRawText = pdfTextExtractorService.extractText(new File(combinedMeta.filePath()));
-
-        // 6. Structured Data Extraction
+        // 6. Structured Data Extraction (only extracts present documents)
         ExtractedClaimData extractedData = structuredDataParser.parse(formRawText, combinedRawText);
 
         // 7. Update Claim Entity with Structured Data

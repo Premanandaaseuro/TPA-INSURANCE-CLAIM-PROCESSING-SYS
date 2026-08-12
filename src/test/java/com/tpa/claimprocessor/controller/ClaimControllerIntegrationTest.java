@@ -92,17 +92,20 @@ class ClaimControllerIntegrationTest {
     }
 
     @Test
-    void testUploadMissingFile_Returns400() throws Exception {
+    void testUploadMissingFile_TriggersR02Rejected() throws Exception {
+        byte[] formBytes = PdfFixtureGenerator.generateSampleClaimFormPdf();
         MockMultipartFile claimForm = new MockMultipartFile(
                 "claimForm",
                 "Claim_Form_Sample.pdf",
                 "application/pdf",
-                "Some PDF Content".getBytes()
+                formBytes
         );
 
-        // Omitting combinedHospitalDocument
+        // Omitting combinedHospitalDocument -> triggers R02 FAIL -> REJECTED
         mockMvc.perform(multipart("/api/claims")
                         .file(claimForm))
-                .andExpect(status().isBadRequest());
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.status", is("REJECTED")))
+                .andExpect(jsonPath("$.decisionReason", containsString("R02")));
     }
 }

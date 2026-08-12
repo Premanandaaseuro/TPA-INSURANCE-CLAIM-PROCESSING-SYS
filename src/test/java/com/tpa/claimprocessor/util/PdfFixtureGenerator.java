@@ -104,7 +104,7 @@ public class PdfFixtureGenerator {
                         "Discharge Date: " + dischargeDate,
                         "Primary Diagnosis: " + diagnosis,
                         "Treating Doctor: " + doctor,
-                        "-----------------------------------------",
+                        "FINAL HOSPITAL BILL DETAILS",
                         "Bill Number: " + billNo,
                         "Bill Date: " + billDate,
                         "Room Charges: " + roomCharges,
