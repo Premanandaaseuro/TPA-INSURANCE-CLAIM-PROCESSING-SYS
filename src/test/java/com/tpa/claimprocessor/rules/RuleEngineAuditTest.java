@@ -317,7 +317,7 @@ class RuleEngineAuditTest {
         }
 
         @Test
-        @DisplayName("Combination R05 + R09 -> NEEDS_MANUAL_REVIEW")
+        @DisplayName("Combination R05 + R09 -> NEEDS_MANUAL_REVIEW with both rules triggered")
         void testCombination_R05_R09_ManualReview() {
             Claim claim = createBaseClaim("CLM-COMB-002");
             ExtractedClaimData data = createCleanExtractedData();
@@ -329,7 +329,9 @@ class RuleEngineAuditTest {
 
             assertEquals(ClaimStatus.NEEDS_MANUAL_REVIEW, claim.getStatus());
             assertTrue(claim.getDecisionReason().contains("R05"));
-            assertTrue(claim.getRuleResults().stream().anyMatch(r -> "R09".equals(r.getRuleCode()) && r.getStatus() == com.tpa.claimprocessor.domain.enums.RuleStatus.NOT_EVALUATED));
+            assertTrue(claim.getDecisionReason().contains("R09"));
+            assertTrue(claim.getRuleResults().stream().anyMatch(r -> "R05".equals(r.getRuleCode()) && r.getStatus() == com.tpa.claimprocessor.domain.enums.RuleStatus.FAIL));
+            assertTrue(claim.getRuleResults().stream().anyMatch(r -> "R09".equals(r.getRuleCode()) && r.getStatus() == com.tpa.claimprocessor.domain.enums.RuleStatus.FAIL));
         }
 
         @Test
@@ -349,17 +351,19 @@ class RuleEngineAuditTest {
             data.setTotalBillAmount(new BigDecimal("10000.00")); // Triggers R08
             // Duplicate patient/admission triggers R10
 
-
             List<RuleEvaluationResult> results = ruleEngineService.evaluateAllRules(claim, data, activePolicy);
             decisionEngineService.applyDecision(claim, results);
 
             assertEquals(ClaimStatus.NEEDS_MANUAL_REVIEW, claim.getStatus());
             assertTrue(claim.getDecisionReason().contains("R04"), "Expected R04 in decision reason, but was: " + claim.getDecisionReason());
-            // Under single primary trigger rule execution, R08 and R10 are marked NOT_EVALUATED
+            assertTrue(claim.getDecisionReason().contains("R08"), "Expected R08 in decision reason, but was: " + claim.getDecisionReason());
+            assertTrue(claim.getDecisionReason().contains("R10"), "Expected R10 in decision reason, but was: " + claim.getDecisionReason());
+
             assertEquals(10, claim.getRuleResults().size());
             assertTrue(claim.getRuleResults().stream().anyMatch(r -> "R03".equals(r.getRuleCode()) && r.getStatus() == com.tpa.claimprocessor.domain.enums.RuleStatus.NOT_EVALUATED));
-            assertTrue(claim.getRuleResults().stream().anyMatch(r -> "R08".equals(r.getRuleCode()) && r.getStatus() == com.tpa.claimprocessor.domain.enums.RuleStatus.NOT_EVALUATED));
-            assertTrue(claim.getRuleResults().stream().anyMatch(r -> "R10".equals(r.getRuleCode()) && r.getStatus() == com.tpa.claimprocessor.domain.enums.RuleStatus.NOT_EVALUATED));
+            assertTrue(claim.getRuleResults().stream().anyMatch(r -> "R04".equals(r.getRuleCode()) && r.getStatus() == com.tpa.claimprocessor.domain.enums.RuleStatus.FAIL));
+            assertTrue(claim.getRuleResults().stream().anyMatch(r -> "R08".equals(r.getRuleCode()) && r.getStatus() == com.tpa.claimprocessor.domain.enums.RuleStatus.FAIL));
+            assertTrue(claim.getRuleResults().stream().anyMatch(r -> "R10".equals(r.getRuleCode()) && r.getStatus() == com.tpa.claimprocessor.domain.enums.RuleStatus.FAIL));
         }
 
         @Test

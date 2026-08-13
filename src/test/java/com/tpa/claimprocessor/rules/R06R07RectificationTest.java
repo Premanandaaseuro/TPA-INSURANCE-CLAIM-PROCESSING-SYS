@@ -222,8 +222,8 @@ public class R06R07RectificationTest {
     }
 
     @Test
-    @DisplayName("TEST 7: R06 fails -> R07-R10 NOT_EVALUATED")
-    void test7_r06FailsShortCircuitsSubsequentRules() {
+    @DisplayName("TEST 7: Multiple manual review failures (R06 + R07) -> Both evaluated and recorded as FAIL")
+    void test7_multipleManualReviewFailures() {
         Claim claim = createValidBaseClaim();
         ExtractedClaimData data = createValidExtractedData();
         data.setClaimFormHospitalName("MediTrust Hospital");
@@ -237,25 +237,19 @@ public class R06R07RectificationTest {
 
         RuleEvaluationResult r06 = results.stream().filter(r -> "R06".equals(r.getRuleCode())).findFirst().orElseThrow();
         assertFalse(r06.isPassed());
+        assertEquals("FAIL", String.valueOf(r06.getStatus()));
 
         RuleEvaluationResult r07 = results.stream().filter(r -> "R07".equals(r.getRuleCode())).findFirst().orElseThrow();
-        assertEquals("NOT_EVALUATED", String.valueOf(r07.getStatus()));
-
-        RuleEvaluationResult r08 = results.stream().filter(r -> "R08".equals(r.getRuleCode())).findFirst().orElseThrow();
-        assertEquals("NOT_EVALUATED", String.valueOf(r08.getStatus()));
-
-        RuleEvaluationResult r09 = results.stream().filter(r -> "R09".equals(r.getRuleCode())).findFirst().orElseThrow();
-        assertEquals("NOT_EVALUATED", String.valueOf(r09.getStatus()));
-
-        RuleEvaluationResult r10 = results.stream().filter(r -> "R10".equals(r.getRuleCode())).findFirst().orElseThrow();
-        assertEquals("NOT_EVALUATED", String.valueOf(r10.getStatus()));
+        assertFalse(r07.isPassed());
+        assertEquals("FAIL", String.valueOf(r07.getStatus()));
 
         assertEquals(ClaimStatus.NEEDS_MANUAL_REVIEW, claim.getStatus());
+        assertTrue(claim.getDecisionReason().contains("R06") && claim.getDecisionReason().contains("R07"));
     }
 
     @Test
-    @DisplayName("TEST 8: R07 fails -> R08-R10 NOT_EVALUATED")
-    void test8_r07FailsShortCircuitsSubsequentRules() {
+    @DisplayName("TEST 8: Single R07 failure -> R07 FAIL, other rules PASS")
+    void test8_r07Failure() {
         Claim claim = createValidBaseClaim();
         ExtractedClaimData data = createValidExtractedData();
         data.setClaimFormAdmissionDate(LocalDate.of(2026, 4, 10));
@@ -267,17 +261,10 @@ public class R06R07RectificationTest {
 
         RuleEvaluationResult r07 = results.stream().filter(r -> "R07".equals(r.getRuleCode())).findFirst().orElseThrow();
         assertFalse(r07.isPassed());
-
-        RuleEvaluationResult r08 = results.stream().filter(r -> "R08".equals(r.getRuleCode())).findFirst().orElseThrow();
-        assertEquals("NOT_EVALUATED", String.valueOf(r08.getStatus()));
-
-        RuleEvaluationResult r09 = results.stream().filter(r -> "R09".equals(r.getRuleCode())).findFirst().orElseThrow();
-        assertEquals("NOT_EVALUATED", String.valueOf(r09.getStatus()));
-
-        RuleEvaluationResult r10 = results.stream().filter(r -> "R10".equals(r.getRuleCode())).findFirst().orElseThrow();
-        assertEquals("NOT_EVALUATED", String.valueOf(r10.getStatus()));
+        assertEquals("FAIL", String.valueOf(r07.getStatus()));
 
         assertEquals(ClaimStatus.NEEDS_MANUAL_REVIEW, claim.getStatus());
+        assertTrue(claim.getDecisionReason().contains("R07"));
     }
 
     @Test
@@ -322,7 +309,7 @@ public class R06R07RectificationTest {
     }
 
     @Test
-    @DisplayName("TEST 11: R02 fails -> REJECTED and later rules NOT_EVALUATED")
+    @DisplayName("TEST 11: R02 fails -> REJECTED and document-dependent rules R05-R08 NOT_EVALUATED")
     void test11_r02FailsShortCircuitsAll() {
         Claim claim = createValidBaseClaim();
         claim.getDocuments().removeIf(d -> d.getDocumentType() == DocumentType.COMBINED_HOSPITAL_DOCUMENT);
@@ -336,10 +323,11 @@ public class R06R07RectificationTest {
         assertFalse(r02.isPassed());
         assertEquals("FAIL", String.valueOf(r02.getStatus()));
 
-        for (int i = 3; i <= 10; i++) {
-            String code = String.format("R%02d", i);
+        // Rules R05..R08 depend on Document 2 (Combined Hospital Document)
+        List<String> doc2Rules = List.of("R05", "R06", "R07", "R08");
+        for (String code : doc2Rules) {
             RuleEvaluationResult r = results.stream().filter(res -> code.equals(res.getRuleCode())).findFirst().orElseThrow();
-            assertEquals("NOT_EVALUATED", String.valueOf(r.getStatus()));
+            assertEquals("NOT_EVALUATED", String.valueOf(r.getStatus()), "Expected " + code + " to be NOT_EVALUATED when Document 2 is missing");
         }
 
         assertEquals(ClaimStatus.REJECTED, claim.getStatus());
