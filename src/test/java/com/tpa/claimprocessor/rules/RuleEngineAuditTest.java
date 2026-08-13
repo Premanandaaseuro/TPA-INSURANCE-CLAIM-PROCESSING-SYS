@@ -405,5 +405,31 @@ class RuleEngineAuditTest {
             assertTrue(claim.getRuleResults().stream().anyMatch(r -> "R04".equals(r.getRuleCode()) && r.isPassed()));
             assertTrue(claim.getRuleResults().stream().anyMatch(r -> "R03".equals(r.getRuleCode()) && !r.isPassed()));
         }
+
+        @Test
+        @DisplayName("TEST 3 - Missing Claim Form -> R01 FAIL (REJECTED), R02 PASS, R03-R10 NOT_EVALUATED, Status REJECTED")
+        void testMissingClaimForm_R01Fail_SkipsDownstreamRules() {
+            Claim claim = createBaseClaim("CLM-R01-001");
+            claim.getDocuments().removeIf(d -> d.getDocumentType() == com.tpa.claimprocessor.domain.enums.DocumentType.CLAIM_FORM);
+
+            ExtractedClaimData data = createCleanExtractedData();
+            data.setClaimFormRawText(null);
+
+            List<RuleEvaluationResult> results = ruleEngineService.evaluateAllRules(claim, data, activePolicy);
+            decisionEngineService.applyDecision(claim, results);
+
+            assertEquals(ClaimStatus.REJECTED, claim.getStatus());
+            assertEquals(10, claim.getRuleResults().size());
+
+            // R01 FAIL
+            assertTrue(claim.getRuleResults().stream().anyMatch(r -> "R01".equals(r.getRuleCode()) && !r.isPassed() && r.getSeverity() == com.tpa.claimprocessor.domain.enums.RuleSeverity.REJECTED));
+            // R02 PASS
+            assertTrue(claim.getRuleResults().stream().anyMatch(r -> "R02".equals(r.getRuleCode()) && r.isPassed()));
+            // R03..R10 NOT_EVALUATED
+            for (int i = 3; i <= 10; i++) {
+                String code = String.format("R%02d", i);
+                assertTrue(claim.getRuleResults().stream().anyMatch(r -> code.equals(r.getRuleCode()) && r.getStatus() == com.tpa.claimprocessor.domain.enums.RuleStatus.NOT_EVALUATED));
+            }
+        }
     }
 }

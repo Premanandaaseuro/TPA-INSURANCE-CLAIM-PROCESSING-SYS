@@ -40,46 +40,69 @@ public class RuleEngineServiceImpl implements RuleEngineService {
         RuleHandler r09 = getHandler("R09");
         RuleHandler r10 = getHandler("R10");
 
-        if (r01 != null) executeAndRecord(r01, claim, extractedData, policy, results);
-        if (r02 != null) executeAndRecord(r02, claim, extractedData, policy, results);
-
-        RuleEvaluationResult r04Result = null;
-        if (r04 != null) {
-            r04Result = executeAndRecord(r04, claim, extractedData, policy, results);
-            log.info("R04 CHECK = {}", r04Result.isPassed() ? "PASS" : "FAIL");
+        // 1. Evaluate R01 (Claim Form Presence)
+        RuleEvaluationResult r01Result = null;
+        if (r01 != null) {
+            r01Result = executeAndRecord(r01, claim, extractedData, policy, results);
         }
+        boolean hasClaimForm = r01Result != null && r01Result.isPassed();
 
-        boolean executingR03 = (r04Result != null && r04Result.isPassed() && r03 != null);
-        log.info("EXECUTING R03 = {}", executingR03);
+        // 2. Evaluate R02 (Combined Hospital Document Presence)
+        RuleEvaluationResult r02Result = null;
+        if (r02 != null) {
+            r02Result = executeAndRecord(r02, claim, extractedData, policy, results);
+        }
+        boolean hasCombinedDoc = r02Result != null && r02Result.isPassed();
 
-        if (executingR03) {
-            executeAndRecord(r03, claim, extractedData, policy, results);
+        // 3. Evaluate Downstream Rules based on Document Availability
+        if (!hasClaimForm) {
+            // Claim Form is missing -> R03..R10 cannot be evaluated!
+            recordNotEvaluated("R03", "Policy Inactive Check", "Policy inactive check was not evaluated because the Claim Form was missing.", claim, results);
+            recordNotEvaluated("R04", "Policy Number Missing", "Policy number missing check was not evaluated because the Claim Form was missing.", claim, results);
+            recordNotEvaluated("R05", "Patient Name Mismatch Check", "Patient name mismatch check was not evaluated because the Claim Form was missing.", claim, results);
+            recordNotEvaluated("R06", "Hospital Name Mismatch Check", "Hospital name mismatch check was not evaluated because the Claim Form was missing.", claim, results);
+            recordNotEvaluated("R07", "Admission/Discharge Date Check", "Admission/discharge date check was not evaluated because the Claim Form was missing.", claim, results);
+            recordNotEvaluated("R08", "Claimed Amount Exceeds Bill Check", "Claimed amount check was not evaluated because the Claim Form was missing.", claim, results);
+            recordNotEvaluated("R09", "High Value Claim Check", "High value claim check was not evaluated because the Claim Form was missing.", claim, results);
+            recordNotEvaluated("R10", "Possible Duplicate Claim Check", "Possible duplicate claim check was not evaluated because the Claim Form was missing.", claim, results);
+
         } else {
-            RuleEvaluationResult r03NotEval = RuleEvaluationResult.notEvaluated(
-                    "R03",
-                    "Policy Inactive Check",
-                    "Policy inactive check was not evaluated because the Policy Number was missing from the uploaded Claim Form."
-            );
-            results.add(r03NotEval);
-            ClaimRuleResult entityResult = new ClaimRuleResult(
-                    claim,
-                    r03NotEval.getRuleCode(),
-                    r03NotEval.getRuleName(),
-                    r03NotEval.isPassed(),
-                    r03NotEval.getStatus(),
-                    r03NotEval.getSeverity(),
-                    r03NotEval.getDetails()
-            );
-            claim.addRuleResult(entityResult);
+            // Claim Form is present -> Evaluate R04 (Policy Number Missing Check inside Claim Form)
+            RuleEvaluationResult r04Result = null;
+            if (r04 != null) {
+                r04Result = executeAndRecord(r04, claim, extractedData, policy, results);
+                log.info("R04 CHECK = {}", r04Result.isPassed() ? "PASS" : "FAIL");
+            }
+
+            // R03 (Active Policy Check) ONLY runs if Policy Number was present & extracted (R04 PASS)
+            boolean executingR03 = (r04Result != null && r04Result.isPassed() && r03 != null);
+            log.info("EXECUTING R03 = {}", executingR03);
+
+            if (executingR03) {
+                executeAndRecord(r03, claim, extractedData, policy, results);
+            } else {
+                recordNotEvaluated("R03", "Policy Inactive Check", "Policy inactive check was not evaluated because the Policy Number was missing from the uploaded Claim Form.", claim, results);
+            }
+
+            // Evaluate R05..R10 if Combined Hospital Document is present
+            if (!hasCombinedDoc) {
+                recordNotEvaluated("R05", "Patient Name Mismatch Check", "Patient name mismatch check was not evaluated because the Combined Hospital Document was missing.", claim, results);
+                recordNotEvaluated("R06", "Hospital Name Mismatch Check", "Hospital name mismatch check was not evaluated because the Combined Hospital Document was missing.", claim, results);
+                recordNotEvaluated("R07", "Admission/Discharge Date Check", "Admission/discharge date check was not evaluated because the Combined Hospital Document was missing.", claim, results);
+                recordNotEvaluated("R08", "Claimed Amount Exceeds Bill Check", "Claimed amount check was not evaluated because the Combined Hospital Document was missing.", claim, results);
+                recordNotEvaluated("R09", "High Value Claim Check", "High value claim check was not evaluated because the Combined Hospital Document was missing.", claim, results);
+                recordNotEvaluated("R10", "Possible Duplicate Claim Check", "Possible duplicate claim check was not evaluated because the Combined Hospital Document was missing.", claim, results);
+            } else {
+                if (r05 != null) executeAndRecord(r05, claim, extractedData, policy, results);
+                if (r06 != null) executeAndRecord(r06, claim, extractedData, policy, results);
+                if (r07 != null) executeAndRecord(r07, claim, extractedData, policy, results);
+                if (r08 != null) executeAndRecord(r08, claim, extractedData, policy, results);
+                if (r09 != null) executeAndRecord(r09, claim, extractedData, policy, results);
+                if (r10 != null) executeAndRecord(r10, claim, extractedData, policy, results);
+            }
         }
 
-        if (r05 != null) executeAndRecord(r05, claim, extractedData, policy, results);
-        if (r06 != null) executeAndRecord(r06, claim, extractedData, policy, results);
-        if (r07 != null) executeAndRecord(r07, claim, extractedData, policy, results);
-        if (r08 != null) executeAndRecord(r08, claim, extractedData, policy, results);
-        if (r09 != null) executeAndRecord(r09, claim, extractedData, policy, results);
-        if (r10 != null) executeAndRecord(r10, claim, extractedData, policy, results);
-
+        // Always sort R01 through R10 in exact sequential order
         results.sort(Comparator.comparing(RuleEvaluationResult::getRuleCode));
         return results;
     }
@@ -106,5 +129,21 @@ public class RuleEngineServiceImpl implements RuleEngineService {
         );
         claim.addRuleResult(entityResult);
         return result;
+    }
+
+    private void recordNotEvaluated(String ruleCode, String ruleName, String details, Claim claim, List<RuleEvaluationResult> results) {
+        RuleEvaluationResult notEval = RuleEvaluationResult.notEvaluated(ruleCode, ruleName, details);
+        results.add(notEval);
+
+        ClaimRuleResult entityResult = new ClaimRuleResult(
+                claim,
+                notEval.getRuleCode(),
+                notEval.getRuleName(),
+                notEval.isPassed(),
+                notEval.getStatus(),
+                notEval.getSeverity(),
+                notEval.getDetails()
+        );
+        claim.addRuleResult(entityResult);
     }
 }
