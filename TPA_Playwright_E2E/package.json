@@ -1,0 +1,30 @@
+{
+  "name": "tpa-playwright-e2e",
+  "version": "1.0.0",
+  "description": "Comprehensive Playwright End-to-End Test Automation Framework for TPA Insurance Claim Processing System",
+  "main": "index.js",
+  "scripts": {
+    "generate-fixtures": "node fixtures/generate_pdfs.js",
+    "test": "playwright test",
+    "headed": "playwright test --headed",
+    "rules": "playwright test tests/e2e/",
+    "golden": "playwright test tests/regression/golden_claim.spec.js",
+    "ui": "playwright test tests/ui/",
+    "api": "playwright test tests/api/",
+    "regression": "playwright test tests/regression/",
+    "report": "playwright show-report reports/html"
+  },
+  "keywords": [
+    "playwright",
+    "e2e",
+    "testing",
+    "tpa",
+    "claim-processing"
+  ],
+  "author": "QA Automation Team",
+  "license": "MIT",
+  "devDependencies": {
+    "@playwright/test": "^1.49.1",
+    "pdf-lib": "^1.17.1"
+  }
+}
