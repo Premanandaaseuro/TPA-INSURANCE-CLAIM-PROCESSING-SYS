@@ -19,7 +19,13 @@ public class StructuredDataParserImpl implements StructuredDataParser {
             DateTimeFormatter.ofPattern("dd-MM-yyyy"),
             DateTimeFormatter.ofPattern("yyyy/MM/dd"),
             DateTimeFormatter.ofPattern("d/M/yyyy"),
-            DateTimeFormatter.ofPattern("d-M-yyyy")
+            DateTimeFormatter.ofPattern("d-M-yyyy"),
+            new java.time.format.DateTimeFormatterBuilder().parseCaseInsensitive().appendPattern("dd MMM yyyy").toFormatter(java.util.Locale.ENGLISH),
+            new java.time.format.DateTimeFormatterBuilder().parseCaseInsensitive().appendPattern("dd MMMM yyyy").toFormatter(java.util.Locale.ENGLISH),
+            new java.time.format.DateTimeFormatterBuilder().parseCaseInsensitive().appendPattern("MMMM d, yyyy").toFormatter(java.util.Locale.ENGLISH),
+            new java.time.format.DateTimeFormatterBuilder().parseCaseInsensitive().appendPattern("MMM d, yyyy").toFormatter(java.util.Locale.ENGLISH),
+            new java.time.format.DateTimeFormatterBuilder().parseCaseInsensitive().appendPattern("dd-MMM-yyyy").toFormatter(java.util.Locale.ENGLISH),
+            new java.time.format.DateTimeFormatterBuilder().parseCaseInsensitive().appendPattern("dd-MMMM-yyyy").toFormatter(java.util.Locale.ENGLISH)
     );
 
     @Override
@@ -117,29 +123,31 @@ public class StructuredDataParserImpl implements StructuredDataParser {
         data.setHospitalName(cleanString(primaryHospital));
 
         // 8. Admission Date
-        String cfAdmissionStr = extractField(formText, "(?i)(?:Admission\\s*Date|Date\\s*of\\s*Admission|DOA|Admitted\\s*On)\\s*[:\\|\\-]?\\s*(\\d{2,4}[\\/\\-]\\d{1,2}[\\/\\-]\\d{2,4})");
-        String dsAdmissionStr = extractField(dischargeSummaryText, "(?i)(?:Admission\\s*Date|Date\\s*of\\s*Admission|DOA|Admitted\\s*On)\\s*[:\\|\\-]?\\s*(\\d{2,4}[\\/\\-]\\d{1,2}[\\/\\-]\\d{2,4})");
+        String dateRegex = "(?i)(?:Admission\\s*Date|Date\\s*of\\s*Admission|DOA|Admitted\\s*On)\\s*[:\\|\\-]?\\s*(\\d{2,4}[\\/\\-]\\d{1,2}[\\/\\-]\\d{2,4}|\\d{1,2}\\s+[A-Za-z]{3,9}\\s+\\d{4}|[A-Za-z]{3,9}\\s+\\d{1,2},\\s*\\d{4}|\\d{1,2}\\-[A-Za-z]{3,9}\\-\\d{4})";
+        String cfAdmissionStr = extractField(formText, dateRegex);
+        String dsAdmissionStr = extractField(dischargeSummaryText, dateRegex);
         data.setClaimFormAdmissionDate(parseDate(cfAdmissionStr));
         data.setDischargeSummaryAdmissionDate(parseDate(dsAdmissionStr));
 
         LocalDate primaryAdmission = parseDate(cfAdmissionStr);
         if (primaryAdmission == null) primaryAdmission = parseDate(dsAdmissionStr);
         if (primaryAdmission == null) {
-            String admFallback = extractField(fullText, "(?i)(?:Admission\\s*Date|Date\\s*of\\s*Admission|DOA)\\s*[:\\|\\-]?\\s*(\\d{2,4}[\\/\\-]\\d{1,2}[\\/\\-]\\d{2,4})");
+            String admFallback = extractField(fullText, dateRegex);
             primaryAdmission = parseDate(admFallback);
         }
         data.setAdmissionDate(primaryAdmission);
 
         // 9. Discharge Date
-        String cfDischargeStr = extractField(formText, "(?i)(?:Discharge\\s*Date|Date\\s*of\\s*Discharge|DOD|Discharged\\s*On)\\s*[:\\|\\-]?\\s*(\\d{2,4}[\\/\\-]\\d{1,2}[\\/\\-]\\d{2,4})");
-        String dsDischargeStr = extractField(dischargeSummaryText, "(?i)(?:Discharge\\s*Date|Date\\s*of\\s*Discharge|DOD|Discharged\\s*On)\\s*[:\\|\\-]?\\s*(\\d{2,4}[\\/\\-]\\d{1,2}[\\/\\-]\\d{2,4})");
+        String disRegex = "(?i)(?:Discharge\\s*Date|Date\\s*of\\s*Discharge|DOD|Discharged\\s*On)\\s*[:\\|\\-]?\\s*(\\d{2,4}[\\/\\-]\\d{1,2}[\\/\\-]\\d{2,4}|\\d{1,2}\\s+[A-Za-z]{3,9}\\s+\\d{4}|[A-Za-z]{3,9}\\s+\\d{1,2},\\s*\\d{4}|\\d{1,2}\\-[A-Za-z]{3,9}\\-\\d{4})";
+        String cfDischargeStr = extractField(formText, disRegex);
+        String dsDischargeStr = extractField(dischargeSummaryText, disRegex);
         data.setClaimFormDischargeDate(parseDate(cfDischargeStr));
         data.setDischargeSummaryDischargeDate(parseDate(dsDischargeStr));
 
         LocalDate primaryDischarge = parseDate(cfDischargeStr);
         if (primaryDischarge == null) primaryDischarge = parseDate(dsDischargeStr);
         if (primaryDischarge == null) {
-            String disFallback = extractField(fullText, "(?i)(?:Discharge\\s*Date|Date\\s*of\\s*Discharge|DOD)\\s*[:\\|\\-]?\\s*(\\d{2,4}[\\/\\-]\\d{1,2}[\\/\\-]\\d{2,4})");
+            String disFallback = extractField(fullText, disRegex);
             primaryDischarge = parseDate(disFallback);
         }
         data.setDischargeDate(primaryDischarge);

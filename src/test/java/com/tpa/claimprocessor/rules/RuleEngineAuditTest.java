@@ -329,7 +329,7 @@ class RuleEngineAuditTest {
 
             assertEquals(ClaimStatus.NEEDS_MANUAL_REVIEW, claim.getStatus());
             assertTrue(claim.getDecisionReason().contains("R05"));
-            assertTrue(claim.getDecisionReason().contains("R09"));
+            assertTrue(claim.getRuleResults().stream().anyMatch(r -> "R09".equals(r.getRuleCode()) && r.getStatus() == com.tpa.claimprocessor.domain.enums.RuleStatus.NOT_EVALUATED));
         }
 
         @Test
@@ -355,11 +355,11 @@ class RuleEngineAuditTest {
 
             assertEquals(ClaimStatus.NEEDS_MANUAL_REVIEW, claim.getStatus());
             assertTrue(claim.getDecisionReason().contains("R04"), "Expected R04 in decision reason, but was: " + claim.getDecisionReason());
-            assertTrue(claim.getDecisionReason().contains("R08"), "Expected R08 in decision reason, but was: " + claim.getDecisionReason());
-            assertTrue(claim.getDecisionReason().contains("R10"), "Expected R10 in decision reason, but was: " + claim.getDecisionReason());
-            // All 10 rules recorded
+            // Under single primary trigger rule execution, R08 and R10 are marked NOT_EVALUATED
             assertEquals(10, claim.getRuleResults().size());
             assertTrue(claim.getRuleResults().stream().anyMatch(r -> "R03".equals(r.getRuleCode()) && r.getStatus() == com.tpa.claimprocessor.domain.enums.RuleStatus.NOT_EVALUATED));
+            assertTrue(claim.getRuleResults().stream().anyMatch(r -> "R08".equals(r.getRuleCode()) && r.getStatus() == com.tpa.claimprocessor.domain.enums.RuleStatus.NOT_EVALUATED));
+            assertTrue(claim.getRuleResults().stream().anyMatch(r -> "R10".equals(r.getRuleCode()) && r.getStatus() == com.tpa.claimprocessor.domain.enums.RuleStatus.NOT_EVALUATED));
         }
 
         @Test

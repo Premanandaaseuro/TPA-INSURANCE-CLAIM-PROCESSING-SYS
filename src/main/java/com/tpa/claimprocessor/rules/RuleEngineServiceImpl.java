@@ -40,65 +40,119 @@ public class RuleEngineServiceImpl implements RuleEngineService {
         RuleHandler r09 = getHandler("R09");
         RuleHandler r10 = getHandler("R10");
 
-        // 1. Evaluate R01 (Claim Form Presence)
-        RuleEvaluationResult r01Result = null;
+        String stopReasonRuleCode = null;
+
+        // 1. R01 - Claim Form Presence
+        RuleEvaluationResult r01Res = null;
         if (r01 != null) {
-            r01Result = executeAndRecord(r01, claim, extractedData, policy, results);
+            r01Res = executeAndRecord(r01, claim, extractedData, policy, results);
+            if (!r01Res.isPassed()) {
+                stopReasonRuleCode = "R01";
+            }
         }
-        boolean hasClaimForm = r01Result != null && r01Result.isPassed();
 
-        // 2. Evaluate R02 (Combined Hospital Document Presence)
-        RuleEvaluationResult r02Result = null;
+        // 2. R02 - Combined Hospital Document Presence
+        RuleEvaluationResult r02Res = null;
         if (r02 != null) {
-            r02Result = executeAndRecord(r02, claim, extractedData, policy, results);
+            r02Res = executeAndRecord(r02, claim, extractedData, policy, results);
+            if (!r02Res.isPassed() && stopReasonRuleCode == null) {
+                stopReasonRuleCode = "R02";
+            }
         }
-        boolean hasCombinedDoc = r02Result != null && r02Result.isPassed();
 
-        // 3. Evaluate Downstream Rules based on Document Availability
-        if (!hasClaimForm) {
-            // Claim Form is missing -> R03..R10 cannot be evaluated!
-            recordNotEvaluated("R03", "Policy Inactive Check", "Policy inactive check was not evaluated because the Claim Form was missing.", claim, results);
-            recordNotEvaluated("R04", "Policy Number Missing", "Policy number missing check was not evaluated because the Claim Form was missing.", claim, results);
-            recordNotEvaluated("R05", "Patient Name Mismatch Check", "Patient name mismatch check was not evaluated because the Claim Form was missing.", claim, results);
-            recordNotEvaluated("R06", "Hospital Name Mismatch Check", "Hospital name mismatch check was not evaluated because the Claim Form was missing.", claim, results);
-            recordNotEvaluated("R07", "Admission/Discharge Date Check", "Admission/discharge date check was not evaluated because the Claim Form was missing.", claim, results);
-            recordNotEvaluated("R08", "Claimed Amount Exceeds Bill Check", "Claimed amount check was not evaluated because the Claim Form was missing.", claim, results);
-            recordNotEvaluated("R09", "High Value Claim Check", "High value claim check was not evaluated because the Claim Form was missing.", claim, results);
-            recordNotEvaluated("R10", "Possible Duplicate Claim Check", "Possible duplicate claim check was not evaluated because the Claim Form was missing.", claim, results);
-
+        // 3. R03 & R04 - Policy Number & Inactive Check
+        if (stopReasonRuleCode != null) {
+            recordNotEvaluated("R03", "Policy Inactive Check",
+                    "Policy inactive check was not evaluated because a prior rule (" + stopReasonRuleCode + ") failed.", claim, results);
+            recordNotEvaluated("R04", "Policy Number Missing",
+                    "Policy number missing check was not evaluated because a prior rule (" + stopReasonRuleCode + ") failed.", claim, results);
         } else {
-            // Claim Form is present -> Evaluate R04 (Policy Number Missing Check inside Claim Form)
-            RuleEvaluationResult r04Result = null;
-            if (r04 != null) {
-                r04Result = executeAndRecord(r04, claim, extractedData, policy, results);
-                log.info("R04 CHECK = {}", r04Result.isPassed() ? "PASS" : "FAIL");
-            }
+            RuleEvaluationResult r04Res = r04 != null ? r04.evaluate(claim, extractedData, policy) : null;
+            boolean hasPolicyNum = r04Res != null && r04Res.isPassed();
 
-            // R03 (Active Policy Check) ONLY runs if Policy Number was present & extracted (R04 PASS)
-            boolean executingR03 = (r04Result != null && r04Result.isPassed() && r03 != null);
-            log.info("EXECUTING R03 = {}", executingR03);
-
-            if (executingR03) {
-                executeAndRecord(r03, claim, extractedData, policy, results);
+            if (hasPolicyNum) {
+                if (r03 != null) {
+                    RuleEvaluationResult r03Res = executeAndRecord(r03, claim, extractedData, policy, results);
+                    if (!r03Res.isPassed()) {
+                        stopReasonRuleCode = "R03";
+                    }
+                }
+                if (r04Res != null) {
+                    recordResult(r04Res, claim, results);
+                }
             } else {
-                recordNotEvaluated("R03", "Policy Inactive Check", "Policy inactive check was not evaluated because the Policy Number was missing from the uploaded Claim Form.", claim, results);
+                recordNotEvaluated("R03", "Policy Inactive Check",
+                        "Policy inactive check was not evaluated because the Policy Number was missing from the uploaded Claim Form.", claim, results);
+                if (r04Res != null) {
+                    recordResult(r04Res, claim, results);
+                    stopReasonRuleCode = "R04";
+                }
             }
+        }
 
-            // Evaluate R05..R10 if Combined Hospital Document is present
-            if (!hasCombinedDoc) {
-                recordNotEvaluated("R05", "Patient Name Mismatch Check", "Patient name mismatch check was not evaluated because the Combined Hospital Document was missing.", claim, results);
-                recordNotEvaluated("R06", "Hospital Name Mismatch Check", "Hospital name mismatch check was not evaluated because the Combined Hospital Document was missing.", claim, results);
-                recordNotEvaluated("R07", "Admission/Discharge Date Check", "Admission/discharge date check was not evaluated because the Combined Hospital Document was missing.", claim, results);
-                recordNotEvaluated("R08", "Claimed Amount Exceeds Bill Check", "Claimed amount check was not evaluated because the Combined Hospital Document was missing.", claim, results);
-                recordNotEvaluated("R09", "High Value Claim Check", "High value claim check was not evaluated because the Combined Hospital Document was missing.", claim, results);
-                recordNotEvaluated("R10", "Possible Duplicate Claim Check", "Possible duplicate claim check was not evaluated because the Combined Hospital Document was missing.", claim, results);
-            } else {
-                if (r05 != null) executeAndRecord(r05, claim, extractedData, policy, results);
-                if (r06 != null) executeAndRecord(r06, claim, extractedData, policy, results);
-                if (r07 != null) executeAndRecord(r07, claim, extractedData, policy, results);
-                if (r08 != null) executeAndRecord(r08, claim, extractedData, policy, results);
-                if (r09 != null) executeAndRecord(r09, claim, extractedData, policy, results);
-                if (r10 != null) executeAndRecord(r10, claim, extractedData, policy, results);
+        // 4. R05 - Patient Name Mismatch Check
+        if (stopReasonRuleCode != null) {
+            recordNotEvaluated("R05", "Patient Name Mismatch Check",
+                    "Patient name mismatch check was not evaluated because a prior rule (" + stopReasonRuleCode + ") failed.", claim, results);
+        } else if (r05 != null) {
+            RuleEvaluationResult res = executeAndRecord(r05, claim, extractedData, policy, results);
+            if (!res.isPassed()) {
+                stopReasonRuleCode = "R05";
+            }
+        }
+
+        // 5. R06 - Hospital Name Mismatch Check
+        if (stopReasonRuleCode != null) {
+            recordNotEvaluated("R06", "Hospital Name Mismatch Check",
+                    "Hospital name mismatch check was not evaluated because a prior rule (" + stopReasonRuleCode + ") failed.", claim, results);
+        } else if (r06 != null) {
+            RuleEvaluationResult res = executeAndRecord(r06, claim, extractedData, policy, results);
+            if (!res.isPassed()) {
+                stopReasonRuleCode = "R06";
+            }
+        }
+
+        // 6. R07 - Admission/Discharge Date Check
+        if (stopReasonRuleCode != null) {
+            recordNotEvaluated("R07", "Admission/Discharge Date Check",
+                    "Admission/discharge date check was not evaluated because a prior rule (" + stopReasonRuleCode + ") failed.", claim, results);
+        } else if (r07 != null) {
+            RuleEvaluationResult res = executeAndRecord(r07, claim, extractedData, policy, results);
+            if (!res.isPassed()) {
+                stopReasonRuleCode = "R07";
+            }
+        }
+
+        // 7. R08 - Claimed Amount Exceeds Bill Check
+        if (stopReasonRuleCode != null) {
+            recordNotEvaluated("R08", "Claimed Amount Exceeds Bill Check",
+                    "Claimed amount check was not evaluated because a prior rule (" + stopReasonRuleCode + ") failed.", claim, results);
+        } else if (r08 != null) {
+            RuleEvaluationResult res = executeAndRecord(r08, claim, extractedData, policy, results);
+            if (!res.isPassed()) {
+                stopReasonRuleCode = "R08";
+            }
+        }
+
+        // 8. R09 - High Value Claim Check
+        if (stopReasonRuleCode != null) {
+            recordNotEvaluated("R09", "High Value Claim Check",
+                    "High value claim check was not evaluated because a prior rule (" + stopReasonRuleCode + ") failed.", claim, results);
+        } else if (r09 != null) {
+            RuleEvaluationResult res = executeAndRecord(r09, claim, extractedData, policy, results);
+            if (!res.isPassed()) {
+                stopReasonRuleCode = "R09";
+            }
+        }
+
+        // 9. R10 - Possible Duplicate Claim Check
+        if (stopReasonRuleCode != null) {
+            recordNotEvaluated("R10", "Possible Duplicate Claim Check",
+                    "Possible duplicate claim check was not evaluated because a prior rule (" + stopReasonRuleCode + ") failed.", claim, results);
+        } else if (r10 != null) {
+            RuleEvaluationResult res = executeAndRecord(r10, claim, extractedData, policy, results);
+            if (!res.isPassed()) {
+                stopReasonRuleCode = "R10";
             }
         }
 
@@ -116,6 +170,10 @@ public class RuleEngineServiceImpl implements RuleEngineService {
 
     private RuleEvaluationResult executeAndRecord(RuleHandler handler, Claim claim, ExtractedClaimData extractedData, Policy policy, List<RuleEvaluationResult> results) {
         RuleEvaluationResult result = handler.evaluate(claim, extractedData, policy);
+        return recordResult(result, claim, results);
+    }
+
+    private RuleEvaluationResult recordResult(RuleEvaluationResult result, Claim claim, List<RuleEvaluationResult> results) {
         results.add(result);
 
         ClaimRuleResult entityResult = new ClaimRuleResult(
@@ -133,17 +191,6 @@ public class RuleEngineServiceImpl implements RuleEngineService {
 
     private void recordNotEvaluated(String ruleCode, String ruleName, String details, Claim claim, List<RuleEvaluationResult> results) {
         RuleEvaluationResult notEval = RuleEvaluationResult.notEvaluated(ruleCode, ruleName, details);
-        results.add(notEval);
-
-        ClaimRuleResult entityResult = new ClaimRuleResult(
-                claim,
-                notEval.getRuleCode(),
-                notEval.getRuleName(),
-                notEval.isPassed(),
-                notEval.getStatus(),
-                notEval.getSeverity(),
-                notEval.getDetails()
-        );
-        claim.addRuleResult(entityResult);
+        recordResult(notEval, claim, results);
     }
 }

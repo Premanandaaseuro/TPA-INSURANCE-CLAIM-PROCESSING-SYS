@@ -43,9 +43,16 @@ public class R06_HospitalNameMismatchRule implements RuleHandler {
 
     private boolean isNormalizedMatch(String s1, String s2) {
         if (s1 == null || s2 == null) return true;
-        String n1 = s1.trim().toLowerCase().replaceAll("[^a-z0-9]", "");
-        String n2 = s2.trim().toLowerCase().replaceAll("[^a-z0-9]", "");
+        String n1 = normalizeHospitalName(s1);
+        String n2 = normalizeHospitalName(s2);
         if (n1.isEmpty() || n2.isEmpty()) return true;
-        return n1.equals(n2) || n1.contains(n2) || n2.contains(n1);
+        return n1.equals(n2);
+    }
+
+    private String normalizeHospitalName(String name) {
+        if (name == null) return "";
+        String norm = name.trim().toLowerCase();
+        norm = norm.replaceAll("[^a-z0-9\\s]", " ");
+        return norm.replaceAll("\\s+", " ").trim();
     }
 }
