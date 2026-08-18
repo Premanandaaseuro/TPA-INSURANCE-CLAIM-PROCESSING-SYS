@@ -23,6 +23,7 @@ export const Header: React.FC<HeaderProps> = ({
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
         {/* Brand */}
         <div 
+          data-testid="header-brand"
           className="flex items-center gap-3 cursor-pointer group"
           onClick={onDashboardClick}
         >
@@ -30,14 +31,15 @@ export const Header: React.FC<HeaderProps> = ({
             <ShieldCheck className="w-6 h-6 text-white" />
           </div>
           <div>
-            <h1 className="font-bold text-lg leading-tight tracking-tight text-white">TPA ClaimEngine</h1>
-            <p className="text-xs text-slate-400 font-medium">Third-Party Administrator Adjudication Portal</p>
+            <h1 className="font-bold text-lg leading-tight tracking-tight text-white" data-testid="header-title">TPA ClaimEngine</h1>
+            <p className="text-xs text-slate-400 font-medium" data-testid="header-subtitle">Third-Party Administrator Adjudication Portal</p>
           </div>
         </div>
 
         {/* Action Controls */}
         <div className="flex items-center gap-3">
           <button
+            data-testid="header-clear-data-button"
             onClick={onClearDataClick}
             className="px-3 py-2 bg-rose-500/10 hover:bg-rose-500/20 text-rose-300 border border-rose-500/30 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-colors"
             title="Clear All Claim Data"
@@ -47,6 +49,7 @@ export const Header: React.FC<HeaderProps> = ({
           </button>
 
           <button
+            data-testid="header-refresh-button"
             onClick={onRefreshClick}
             disabled={isRefreshing}
             className="p-2 text-slate-400 hover:text-white hover:bg-slate-800 rounded-lg transition-colors flex items-center gap-1.5 text-xs font-medium"
@@ -57,6 +60,7 @@ export const Header: React.FC<HeaderProps> = ({
           </button>
 
           <button
+            data-testid="header-dashboard-button"
             onClick={onDashboardClick}
             className={`px-3 py-2 rounded-lg text-xs font-medium flex items-center gap-2 transition-colors ${
               activeTab === 'dashboard'
@@ -69,6 +73,7 @@ export const Header: React.FC<HeaderProps> = ({
           </button>
 
           <button
+            data-testid="header-submit-claim-button"
             onClick={onNewClaimClick}
             className="px-4 py-2 bg-gradient-to-r from-sky-500 to-blue-600 hover:from-sky-600 hover:to-blue-700 text-white rounded-lg text-xs font-semibold flex items-center gap-2 shadow-lg shadow-sky-500/25 transition-all hover:shadow-sky-500/40 active:scale-95"
           >

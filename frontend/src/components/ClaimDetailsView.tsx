@@ -32,6 +32,7 @@ export const ClaimDetailsView: React.FC<ClaimDetailsViewProps> = ({ claim, onBac
       {/* Top Bar: Back & Download PDF */}
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <button
+          data-testid="back-to-dashboard-button"
           onClick={onBack}
           className="inline-flex items-center gap-2 text-xs font-semibold text-slate-600 hover:text-slate-900 bg-white border border-slate-200 px-3.5 py-2 rounded-xl shadow-sm hover:shadow transition-all"
         >
@@ -40,6 +41,7 @@ export const ClaimDetailsView: React.FC<ClaimDetailsViewProps> = ({ claim, onBac
         </button>
 
         <a
+          data-testid="export-pdf-link"
           href={exportUrl}
           target="_blank"
           rel="noopener noreferrer"
@@ -51,7 +53,7 @@ export const ClaimDetailsView: React.FC<ClaimDetailsViewProps> = ({ claim, onBac
       </div>
 
       {/* Decision Header Card */}
-      <div className={`bg-white rounded-3xl p-6 border shadow-sm relative overflow-hidden ${
+      <div data-testid="decision-card" className={`bg-white rounded-3xl p-6 border shadow-sm relative overflow-hidden ${
         claim.status === 'APPROVED'
           ? 'border-emerald-200'
           : claim.status === 'REJECTED'
@@ -64,7 +66,7 @@ export const ClaimDetailsView: React.FC<ClaimDetailsViewProps> = ({ claim, onBac
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-slate-100">
           <div>
             <div className="flex items-center gap-3 flex-wrap">
-              <h2 className="text-2xl font-black text-slate-900 tracking-tight">{claim.claimNumber || claim.claimId}</h2>
+              <h2 className="text-2xl font-black text-slate-900 tracking-tight" data-testid="claim-details-id">{claim.claimNumber || claim.claimId}</h2>
               <StatusBadge status={claim.status} size="lg" />
             </div>
             <p className="text-xs text-slate-500 mt-1">
@@ -81,13 +83,13 @@ export const ClaimDetailsView: React.FC<ClaimDetailsViewProps> = ({ claim, onBac
       </div>
 
       {/* Grid: Extracted Structured Data */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4" data-testid="extracted-data-grid">
         <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm space-y-1">
           <div className="flex items-center gap-2 text-xs font-medium text-slate-400 uppercase tracking-wider">
             <ShieldCheck className="w-4 h-4 text-sky-500" />
             Policy Information
           </div>
-          <p className="text-base font-bold text-slate-900">{claim.policyNumber || 'Unextracted'}</p>
+          <p className="text-base font-bold text-slate-900" data-testid="details-policy-number">{claim.policyNumber || 'Unextracted'}</p>
           <p className="text-xs text-slate-500 font-medium">{claim.carrierName || 'Standard Carrier'}</p>
         </div>
 
@@ -96,7 +98,7 @@ export const ClaimDetailsView: React.FC<ClaimDetailsViewProps> = ({ claim, onBac
             <User className="w-4 h-4 text-indigo-500" />
             Patient & Customer
           </div>
-          <p className="text-base font-bold text-slate-900">{claim.patientName || 'N/A'}</p>
+          <p className="text-base font-bold text-slate-900" data-testid="details-patient-name">{claim.patientName || 'N/A'}</p>
           <p className="text-xs text-slate-500 font-medium">Customer: {claim.customerName || 'N/A'}</p>
         </div>
 
@@ -105,7 +107,7 @@ export const ClaimDetailsView: React.FC<ClaimDetailsViewProps> = ({ claim, onBac
             <Building2 className="w-4 h-4 text-amber-500" />
             Hospital & Dates
           </div>
-          <p className="text-base font-bold text-slate-900 truncate">{claim.hospitalName || 'N/A'}</p>
+          <p className="text-base font-bold text-slate-900 truncate" data-testid="details-hospital-name">{claim.hospitalName || 'N/A'}</p>
           <p className="text-xs text-slate-500 font-medium">
             {claim.admissionDate || '?'} to {claim.dischargeDate || '?'}
           </p>
@@ -116,7 +118,7 @@ export const ClaimDetailsView: React.FC<ClaimDetailsViewProps> = ({ claim, onBac
             <IndianRupee className="w-4 h-4 text-emerald-500" />
             Claimed Amount
           </div>
-          <p className="text-base font-black text-slate-900">
+          <p className="text-base font-black text-slate-900" data-testid="details-claimed-amount">
             {claim.claimedAmount ? `₹${claim.claimedAmount.toLocaleString()}` : 'N/A'}
           </p>
           <p className="text-xs text-slate-500 font-medium">Type: {claim.claimType || 'REIMBURSEMENT'}</p>
@@ -139,7 +141,7 @@ export const ClaimDetailsView: React.FC<ClaimDetailsViewProps> = ({ claim, onBac
 
         {claim.ruleResults && claim.ruleResults.length > 0 ? (
           <div className="overflow-x-auto">
-            <table className="w-full text-left border-collapse">
+            <table className="w-full text-left border-collapse" data-testid="rule-audit-table">
               <thead>
                 <tr className="bg-slate-50/80 border-b border-slate-200 text-[11px] font-bold text-slate-500 uppercase tracking-wider">
                   <th className="py-3.5 px-4">Rule ID</th>
@@ -161,7 +163,7 @@ export const ClaimDetailsView: React.FC<ClaimDetailsViewProps> = ({ claim, onBac
                     : '';
 
                   return (
-                    <tr key={rule.ruleCode} className={`hover:bg-slate-50/60 transition-colors ${rowBg}`}>
+                    <tr key={rule.ruleCode} data-testid={`rule-row-${rule.ruleCode}`} className={`hover:bg-slate-50/60 transition-colors ${rowBg}`}>
                       <td className="py-3.5 px-4 font-mono font-bold text-slate-800">
                         {rule.ruleCode}
                       </td>

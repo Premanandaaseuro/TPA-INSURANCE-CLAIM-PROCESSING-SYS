@@ -15,7 +15,24 @@ export const NewClaimModal: React.FC<NewClaimModalProps> = ({ isOpen, onClose, o
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
+  React.useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        handleClose();
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, []);
+
   if (!isOpen) return null;
+
+  function handleClose() {
+    setClaimFormFile(null);
+    setCombinedDocFile(null);
+    setErrorMessage(null);
+    onClose();
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -30,6 +47,8 @@ export const NewClaimModal: React.FC<NewClaimModalProps> = ({ isOpen, onClose, o
       setIsSubmitting(true);
       const newClaim = await submitClaim(claimFormFile, combinedDocFile);
       setIsSubmitting(false);
+      setClaimFormFile(null);
+      setCombinedDocFile(null);
       onSuccess(newClaim);
     } catch (err: any) {
       setIsSubmitting(false);
@@ -38,16 +57,17 @@ export const NewClaimModal: React.FC<NewClaimModalProps> = ({ isOpen, onClose, o
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/60 backdrop-blur-sm animate-fade-in">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/60 backdrop-blur-sm animate-fade-in" data-testid="new-claim-modal">
       <div className="bg-white rounded-3xl max-w-xl w-full border border-slate-200 shadow-2xl overflow-hidden">
         {/* Modal Header */}
         <div className="px-6 py-4 bg-slate-900 text-white flex items-center justify-between">
           <div>
-            <h2 className="font-bold text-base">Submit New Claim Payload</h2>
+            <h2 className="font-bold text-base" data-testid="modal-title">Submit New Claim Payload</h2>
             <p className="text-xs text-slate-400">Upload exactly two mandatory claim documents for automated AI/OCR extraction.</p>
           </div>
           <button
-            onClick={onClose}
+            data-testid="modal-close-button"
+            onClick={handleClose}
             disabled={isSubmitting}
             className="p-1.5 text-slate-400 hover:text-white rounded-lg hover:bg-slate-800 transition-colors"
           >
@@ -56,9 +76,9 @@ export const NewClaimModal: React.FC<NewClaimModalProps> = ({ isOpen, onClose, o
         </div>
 
         {/* Modal Body / Form */}
-        <form onSubmit={handleSubmit} className="p-6 space-y-5">
+        <form onSubmit={handleSubmit} className="p-6 space-y-5" data-testid="new-claim-form">
           {errorMessage && (
-            <div className="p-3.5 bg-rose-50 border border-rose-200 rounded-xl text-rose-700 text-xs flex items-start gap-2.5">
+            <div className="p-3.5 bg-rose-50 border border-rose-200 rounded-xl text-rose-700 text-xs flex items-start gap-2.5" data-testid="upload-error-message">
               <AlertCircle className="w-4 h-4 text-rose-500 shrink-0 mt-0.5" />
               <div>
                 <span className="font-bold">Upload Error: </span>
@@ -84,6 +104,7 @@ export const NewClaimModal: React.FC<NewClaimModalProps> = ({ isOpen, onClose, o
                 type="file"
                 accept=".pdf,application/pdf"
                 id="claimFormInput"
+                data-testid="claim-form-input"
                 className="hidden"
                 onChange={(e) => {
                   if (e.target.files && e.target.files[0]) {
@@ -91,7 +112,7 @@ export const NewClaimModal: React.FC<NewClaimModalProps> = ({ isOpen, onClose, o
                   }
                 }}
               />
-              <label htmlFor="claimFormInput" className="cursor-pointer block">
+              <label htmlFor="claimFormInput" className="cursor-pointer block" data-testid="claim-form-label">
                 {claimFormFile ? (
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-3">
@@ -133,6 +154,7 @@ export const NewClaimModal: React.FC<NewClaimModalProps> = ({ isOpen, onClose, o
                 type="file"
                 accept=".pdf,application/pdf"
                 id="combinedDocInput"
+                data-testid="combined-doc-input"
                 className="hidden"
                 onChange={(e) => {
                   if (e.target.files && e.target.files[0]) {
@@ -140,7 +162,7 @@ export const NewClaimModal: React.FC<NewClaimModalProps> = ({ isOpen, onClose, o
                   }
                 }}
               />
-              <label htmlFor="combinedDocInput" className="cursor-pointer block">
+              <label htmlFor="combinedDocInput" className="cursor-pointer block" data-testid="combined-doc-label">
                 {combinedDocFile ? (
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-3">
@@ -168,14 +190,16 @@ export const NewClaimModal: React.FC<NewClaimModalProps> = ({ isOpen, onClose, o
           {/* Form Actions */}
           <div className="pt-3 border-t border-slate-100 flex items-center justify-end gap-3">
             <button
+              data-testid="cancel-claim-button"
               type="button"
-              onClick={onClose}
+              onClick={handleClose}
               disabled={isSubmitting}
               className="px-4 py-2 text-xs font-semibold text-slate-600 hover:bg-slate-100 rounded-xl transition-colors"
             >
               Cancel
             </button>
             <button
+              data-testid="submit-claim-button"
               type="submit"
               disabled={isSubmitting || (!claimFormFile && !combinedDocFile)}
               className="px-5 py-2.5 bg-gradient-to-r from-sky-600 to-blue-600 hover:from-sky-700 hover:to-blue-700 disabled:opacity-50 text-white rounded-xl text-xs font-bold shadow-lg shadow-sky-500/25 flex items-center gap-2 transition-all"

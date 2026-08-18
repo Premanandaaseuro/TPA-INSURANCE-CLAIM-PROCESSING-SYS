@@ -1,38 +1,28 @@
 /**
- * Claim Details Page Object Model
+ * ClaimDetailsPage Object Model
  */
-class ClaimDetailsPage {
+export class ClaimDetailsPage {
+  /**
+   * @param {import('@playwright/test').Page} page
+   */
   constructor(page) {
     this.page = page;
-    this.statusBadge = page.locator('div.border span.rounded-full').first();
-    this.decisionReasonBanner = page.locator('p:has-text("Claim"), div:has-text("Decision Reason")').first();
-    this.exportPdfBtn = page.getByRole('link', { name: /Export Summary PDF/i });
-    this.backToDashboardBtn = page.getByRole('button', { name: /Back to Dashboard|Back/i });
-    this.auditTable = page.locator('table');
+    this.backToDashboardButton = page.getByTestId('back-to-dashboard-button');
+    this.exportPdfLink = page.getByTestId('export-pdf-link');
+    this.decisionCard = page.getByTestId('decision-card');
+    this.claimDetailsId = page.getByTestId('claim-details-id');
+    this.detailsPolicyNumber = page.getByTestId('details-policy-number');
+    this.detailsPatientName = page.getByTestId('details-patient-name');
+    this.detailsHospitalName = page.getByTestId('details-hospital-name');
+    this.detailsClaimedAmount = page.getByTestId('details-claimed-amount');
+    this.ruleAuditTable = page.getByTestId('rule-audit-table');
   }
 
-  async getStatusText() {
-    await this.statusBadge.waitFor({ state: 'visible', timeout: 5000 });
-    return await this.statusBadge.innerText();
+  async clickBackToDashboard() {
+    await this.backToDashboardButton.click();
   }
 
-  async getDecisionReason() {
-    return await this.decisionReasonBanner.innerText();
-  }
-
-  async exportPdf() {
-    const downloadPromise = this.page.waitForEvent('download');
-    await this.exportPdfBtn.click();
-    return await downloadPromise;
-  }
-
-  async backToDashboard() {
-    if (await this.backToDashboardBtn.isVisible()) {
-      await this.backToDashboardBtn.click();
-    } else {
-      await this.page.goto('/');
-    }
+  async clickExportPdf() {
+    await this.exportPdfLink.click();
   }
 }
-
-module.exports = { ClaimDetailsPage };

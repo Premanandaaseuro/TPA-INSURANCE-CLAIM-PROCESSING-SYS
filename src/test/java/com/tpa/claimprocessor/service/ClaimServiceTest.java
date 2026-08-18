@@ -18,7 +18,12 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.mock.web.MockMultipartFile;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
@@ -28,35 +33,37 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
-@ExtendWith(MockitoExtension.class)
+@SpringBootTest
+@ActiveProfiles("test")
+@Transactional
 class ClaimServiceTest {
 
-    @Mock
+    @MockBean
     private ClaimRepository claimRepository;
 
-    @Mock
+    @MockBean
     private PolicyRepository policyRepository;
 
-    @Mock
-    private ClaimIdGeneratorService claimIdGeneratorService;
-
-    @Mock
+    @MockBean
     private FileStorageService fileStorageService;
 
-    @Mock
+    @MockBean
     private PdfTextExtractorService pdfTextExtractorService;
 
-    @Mock
+    @MockBean
     private StructuredDataParser structuredDataParser;
 
-    @Mock
+    @MockBean
     private RuleEngineService ruleEngineService;
 
-    @Mock
+    @MockBean
     private DecisionEngineService decisionEngineService;
 
-    @InjectMocks
+    @Autowired
     private ClaimServiceImpl claimService;
+    
+    @Autowired
+    private ClaimIdGeneratorService claimIdGeneratorService;
 
     private MockMultipartFile validClaimForm;
     private MockMultipartFile validCombinedDoc;
@@ -69,7 +76,7 @@ class ClaimServiceTest {
 
     @Test
     void createClaim_Success() {
-        when(claimIdGeneratorService.generateNextClaimId()).thenReturn("CLM-2026-000001");
+        String nextClaimId = claimIdGeneratorService.generateNextClaimId();
 
         FileStorageService.StoredFileMetaData formMeta = new FileStorageService.StoredFileMetaData(
                 "claim_form.pdf", "claim_form.pdf", "target/test-storage/claim_form.pdf", "application/pdf", 100L, "hash1"
@@ -78,9 +85,9 @@ class ClaimServiceTest {
                 "combined.pdf", "combined_document.pdf", "target/test-storage/combined_document.pdf", "application/pdf", 200L, "hash2"
         );
 
-        when(fileStorageService.storeFile(eq("CLM-2026-000001"), eq(DocumentType.CLAIM_FORM), any(MultipartFile.class)))
+        when(fileStorageService.storeFile(eq(nextClaimId), eq(DocumentType.CLAIM_FORM), any(MultipartFile.class)))
                 .thenReturn(formMeta);
-        when(fileStorageService.storeFile(eq("CLM-2026-000001"), eq(DocumentType.COMBINED_HOSPITAL_DOCUMENT), any(MultipartFile.class)))
+        when(fileStorageService.storeFile(eq(nextClaimId), eq(DocumentType.COMBINED_HOSPITAL_DOCUMENT), any(MultipartFile.class)))
                 .thenReturn(combinedMeta);
 
         when(pdfTextExtractorService.extractText(any(File.class))).thenReturn("Sample Raw Text");
@@ -102,7 +109,7 @@ class ClaimServiceTest {
         when(claimRepository.findByClaimIdWithDetails(anyString())).thenAnswer(invocation -> {
             Claim claim = new Claim();
             claim.setId(1L);
-            claim.setClaimId("CLM-2026-000001");
+            claim.setClaimId(nextClaimId);
             claim.setStatus(ClaimStatus.APPROVED);
             com.tpa.claimprocessor.domain.entity.ClaimDocument doc1 = new com.tpa.claimprocessor.domain.entity.ClaimDocument();
             doc1.setDocumentType(DocumentType.CLAIM_FORM);
@@ -115,7 +122,7 @@ class ClaimServiceTest {
         ClaimResponseDto result = claimService.createClaim(validClaimForm, validCombinedDoc);
 
         assertNotNull(result);
-        assertEquals("CLM-2026-000001", result.getClaimId());
+        assertEquals(nextClaimId, result.getClaimId());
         assertEquals(ClaimStatus.APPROVED, result.getStatus());
         assertEquals(2, result.getDocuments().size());
 
@@ -124,11 +131,11 @@ class ClaimServiceTest {
 
     @Test
     void createClaim_MissingClaimForm_TriggersR01Rejected() {
-        when(claimIdGeneratorService.generateNextClaimId()).thenReturn("CLM-2026-000002");
+        String nextClaimId = claimIdGeneratorService.generateNextClaimId();
         FileStorageService.StoredFileMetaData combinedMeta = new FileStorageService.StoredFileMetaData(
                 "combined.pdf", "combined_document.pdf", "target/test-storage/combined_document.pdf", "application/pdf", 200L, "hash2"
         );
-        when(fileStorageService.storeFile(eq("CLM-2026-000002"), eq(DocumentType.COMBINED_HOSPITAL_DOCUMENT), any(MultipartFile.class)))
+        when(fileStorageService.storeFile(eq(nextClaimId), eq(DocumentType.COMBINED_HOSPITAL_DOCUMENT), any(MultipartFile.class)))
                 .thenReturn(combinedMeta);
         when(pdfTextExtractorService.extractText(any(File.class))).thenReturn("Sample Raw Text");
         when(structuredDataParser.parse(anyString(), anyString())).thenReturn(new ExtractedClaimData());
@@ -148,7 +155,7 @@ class ClaimServiceTest {
         when(claimRepository.save(any(Claim.class))).thenAnswer(invocation -> invocation.getArgument(0));
         when(claimRepository.findByClaimIdWithDetails(anyString())).thenAnswer(invocation -> {
             Claim c = new Claim();
-            c.setClaimId("CLM-2026-000002");
+            c.setClaimId(nextClaimId);
             c.setStatus(ClaimStatus.REJECTED);
             c.setDecisionReason("R01 – Claim Form is missing.");
             c.setDocuments(java.util.List.of());
@@ -162,11 +169,11 @@ class ClaimServiceTest {
 
     @Test
     void createClaim_MissingCombinedDoc_TriggersR02Rejected() {
-        when(claimIdGeneratorService.generateNextClaimId()).thenReturn("CLM-2026-000003");
+        String nextClaimId = claimIdGeneratorService.generateNextClaimId();
         FileStorageService.StoredFileMetaData formMeta = new FileStorageService.StoredFileMetaData(
                 "claim_form.pdf", "claim_form.pdf", "target/test-storage/claim_form.pdf", "application/pdf", 100L, "hash1"
         );
-        when(fileStorageService.storeFile(eq("CLM-2026-000003"), eq(DocumentType.CLAIM_FORM), any(MultipartFile.class)))
+        when(fileStorageService.storeFile(eq(nextClaimId), eq(DocumentType.CLAIM_FORM), any(MultipartFile.class)))
                 .thenReturn(formMeta);
         when(pdfTextExtractorService.extractText(any(File.class))).thenReturn("Sample Raw Text");
         when(structuredDataParser.parse(anyString(), anyString())).thenReturn(new ExtractedClaimData());
@@ -186,7 +193,7 @@ class ClaimServiceTest {
         when(claimRepository.save(any(Claim.class))).thenAnswer(invocation -> invocation.getArgument(0));
         when(claimRepository.findByClaimIdWithDetails(anyString())).thenAnswer(invocation -> {
             Claim c = new Claim();
-            c.setClaimId("CLM-2026-000003");
+            c.setClaimId(nextClaimId);
             c.setStatus(ClaimStatus.REJECTED);
             c.setDecisionReason("R02 – Combined Hospital Document is missing.");
             c.setDocuments(java.util.List.of());

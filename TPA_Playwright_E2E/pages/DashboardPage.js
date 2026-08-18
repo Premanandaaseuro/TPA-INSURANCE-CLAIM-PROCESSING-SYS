@@ -1,55 +1,66 @@
 /**
- * Dashboard Page Object Model
+ * DashboardPage Object Model
  */
-class DashboardPage {
+export class DashboardPage {
+  /**
+   * @param {import('@playwright/test').Page} page
+   */
   constructor(page) {
     this.page = page;
-    this.newClaimBtn = page.getByRole('button', { name: 'Submit New Claim' });
-    this.searchInput = page.getByPlaceholder(/Search Claim ID/i);
-    this.clearDataBtn = page.getByRole('button', { name: /Clear Data/i });
-    this.claimsTableRows = page.locator('tbody tr');
+    this.searchInput = page.getByTestId('search-input');
+    this.statusFiltersContainer = page.getByTestId('status-filters');
+    this.filterAll = page.getByTestId('filter-ALL');
+    this.filterApproved = page.getByTestId('filter-APPROVED');
+    this.filterReview = page.getByTestId('filter-NEEDS_MANUAL_REVIEW');
+    this.filterRejected = page.getByTestId('filter-REJECTED');
+    this.claimsTableContainer = page.getByTestId('claims-table-container');
+    this.claimsTable = page.getByTestId('claims-table');
+    this.claimsTableBody = page.getByTestId('claims-table-body');
+    this.emptyState = page.getByTestId('empty-claims-state');
+    this.submitFirstClaimButton = page.getByTestId('submit-first-claim-button');
+    this.loadingState = page.getByTestId('loading-state');
+    this.metricTotal = page.getByTestId('metric-card-total-submissions');
+    this.metricTotalValue = page.getByTestId('metric-card-total-submissions-value');
+    this.metricApproved = page.getByTestId('metric-card-auto-approved');
+    this.metricApprovedValue = page.getByTestId('metric-card-auto-approved-value');
+    this.metricReview = page.getByTestId('metric-card-needs-review');
+    this.metricReviewValue = page.getByTestId('metric-card-needs-review-value');
+    this.metricRejected = page.getByTestId('metric-card-rejected-claims');
+    this.metricRejectedValue = page.getByTestId('metric-card-rejected-claims-value');
   }
 
-  async goto() {
-    await this.page.goto('/');
-    await this.page.waitForLoadState('networkidle');
-  }
-
-  async openNewClaimModal() {
-    await this.newClaimBtn.click();
-    await this.page.waitForSelector('form, div[role="dialog"]', { timeout: 5000 });
-  }
-
-  async searchClaim(query) {
+  async search(query) {
     await this.searchInput.fill(query);
-    await this.page.waitForTimeout(500); // UI filter debounce
+    await this.page.waitForTimeout(300);
+  }
+
+  async clearSearch() {
+    await this.searchInput.fill('');
+    await this.page.waitForTimeout(300);
   }
 
   async filterByStatus(status) {
-    const btn = this.page.getByRole('button', { name: new RegExp(status, 'i') });
-    if (await btn.isVisible()) {
-      await btn.click();
-    }
-    await this.page.waitForTimeout(500);
+    const filterBtn = this.page.getByTestId(`filter-${status}`);
+    await filterBtn.click();
+    await this.page.waitForTimeout(300);
   }
 
-  async openClaimDetails(claimId) {
-    const row = this.page.locator(`tr:has-text("${claimId}")`);
-    await row.getByRole('button', { name: /View Details|View/i }).click();
+  getClaimRow(claimId) {
+    return this.page.getByTestId(`claim-row-${claimId}`);
   }
 
-  async clearAllData() {
-    if (await this.clearDataBtn.isVisible()) {
-      this.page.once('dialog', dialog => dialog.accept());
-      await this.clearDataBtn.click();
-      await this.page.waitForTimeout(1000);
-    }
+  async clickClaimRow(claimId) {
+    const row = this.getClaimRow(claimId);
+    await row.click();
   }
 
-  async getClaimRowText(claimId) {
-    const row = this.page.locator(`tr:has-text("${claimId}")`);
-    return await row.innerText();
+  async clickAuditButton(claimId) {
+    const auditBtn = this.page.getByTestId(`view-audit-button-${claimId}`);
+    await auditBtn.click();
+  }
+
+  async getTableRowCount() {
+    const rows = this.page.locator('[data-testid^="claim-row-"]');
+    return await rows.count();
   }
 }
-
-module.exports = { DashboardPage };

@@ -81,6 +81,7 @@ export const ClaimsDashboard: React.FC<ClaimsDashboardProps> = ({
         <div className="relative w-full md:w-80">
           <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-3" />
           <input
+            data-testid="search-input"
             type="text"
             placeholder="Search Claim ID, Patient, Policy..."
             value={searchTerm}
@@ -90,10 +91,11 @@ export const ClaimsDashboard: React.FC<ClaimsDashboardProps> = ({
         </div>
 
         {/* Status Pills */}
-        <div className="flex items-center gap-1.5 overflow-x-auto w-full md:w-auto pb-1 md:pb-0">
+        <div className="flex items-center gap-1.5 overflow-x-auto w-full md:w-auto pb-1 md:pb-0" data-testid="status-filters">
           {(['ALL', 'APPROVED', 'NEEDS_MANUAL_REVIEW', 'REJECTED'] as const).map((st) => (
             <button
               key={st}
+              data-testid={`filter-${st}`}
               onClick={() => setStatusFilter(st)}
               className={`px-3 py-1.5 rounded-xl text-xs font-semibold whitespace-nowrap transition-all ${
                 statusFilter === st
@@ -108,14 +110,14 @@ export const ClaimsDashboard: React.FC<ClaimsDashboardProps> = ({
       </div>
 
       {/* Claims List Table */}
-      <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+      <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden" data-testid="claims-table-container">
         {isLoading ? (
-          <div className="p-12 text-center">
+          <div className="p-12 text-center" data-testid="loading-state">
             <div className="inline-block w-8 h-8 border-3 border-sky-500 border-t-transparent rounded-full animate-spin"></div>
             <p className="mt-3 text-xs font-medium text-slate-500">Loading claims database...</p>
           </div>
         ) : filteredClaims.length === 0 ? (
-          <div className="p-12 text-center">
+          <div className="p-12 text-center" data-testid="empty-claims-state">
             <FileText className="w-12 h-12 text-slate-300 mx-auto mb-3" />
             <h3 className="text-sm font-bold text-slate-800">No claims found</h3>
             <p className="text-xs text-slate-500 max-w-sm mx-auto mt-1">
@@ -125,6 +127,7 @@ export const ClaimsDashboard: React.FC<ClaimsDashboardProps> = ({
             </p>
             {claims.length === 0 && (
               <button
+                data-testid="submit-first-claim-button"
                 onClick={onNewClaimClick}
                 className="mt-4 px-4 py-2 bg-sky-600 hover:bg-sky-700 text-white text-xs font-semibold rounded-xl shadow-sm transition-colors"
               >
@@ -134,7 +137,7 @@ export const ClaimsDashboard: React.FC<ClaimsDashboardProps> = ({
           </div>
         ) : (
           <div className="overflow-x-auto">
-            <table className="w-full text-left border-collapse">
+            <table className="w-full text-left border-collapse" data-testid="claims-table">
               <thead>
                 <tr className="bg-slate-50/80 border-b border-slate-200 text-[11px] font-bold text-slate-500 uppercase tracking-wider">
                   <th className="py-3.5 px-4">Claim ID</th>
@@ -146,24 +149,25 @@ export const ClaimsDashboard: React.FC<ClaimsDashboardProps> = ({
                   <th className="py-3.5 px-4 text-right">Action</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-100 text-xs">
+              <tbody className="divide-y divide-slate-100 text-xs" data-testid="claims-table-body">
                 {filteredClaims.map((claim) => (
                   <tr
                     key={String(claim.claimNumber || claim.claimId)}
+                    data-testid={`claim-row-${claim.claimId}`}
                     className="hover:bg-slate-50/60 transition-colors group cursor-pointer"
                     onClick={() => onSelectClaim(String(claim.claimNumber || claim.claimId))}
                   >
-                    <td className="py-3.5 px-4 font-bold text-sky-600 group-hover:underline">
+                    <td className="py-3.5 px-4 font-bold text-sky-600 group-hover:underline" data-testid="claim-id-cell">
                       {claim.claimNumber || claim.claimId}
                     </td>
                     <td className="py-3.5 px-4">
-                      <div className="font-semibold text-slate-900">{claim.patientName || 'N/A'}</div>
-                      <div className="text-[11px] text-slate-500 font-mono">{claim.policyNumber || 'Policy Unextracted'}</div>
+                      <div className="font-semibold text-slate-900" data-testid="patient-name-cell">{claim.patientName || 'N/A'}</div>
+                      <div className="text-[11px] text-slate-500 font-mono" data-testid="policy-number-cell">{claim.policyNumber || 'Policy Unextracted'}</div>
                     </td>
-                    <td className="py-3.5 px-4 text-slate-700 font-medium">
+                    <td className="py-3.5 px-4 text-slate-700 font-medium" data-testid="hospital-name-cell">
                       {claim.hospitalName || 'N/A'}
                     </td>
-                    <td className="py-3.5 px-4 font-bold text-slate-900">
+                    <td className="py-3.5 px-4 font-bold text-slate-900" data-testid="claimed-amount-cell">
                       {claim.claimedAmount ? `₹${claim.claimedAmount.toLocaleString()}` : 'N/A'}
                     </td>
                     <td className="py-3.5 px-4">
@@ -191,6 +195,7 @@ export const ClaimsDashboard: React.FC<ClaimsDashboardProps> = ({
                     </td>
                     <td className="py-3.5 px-4 text-right">
                       <button
+                        data-testid={`view-audit-button-${claim.claimId}`}
                         onClick={(e) => {
                           e.stopPropagation();
                           onSelectClaim(claim.claimId);

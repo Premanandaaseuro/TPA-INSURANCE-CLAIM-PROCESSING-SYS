@@ -1,31 +1,35 @@
-const { defineConfig, devices } = require('@playwright/test');
+import { defineConfig, devices } from '@playwright/test';
 
 /**
- * Playwright E2E Configuration for TPA Insurance Claim Processing System
+ * Playwright Configuration for TPA Insurance Claim Processing System E2E Suite
  */
-module.exports = defineConfig({
+export default defineConfig({
   testDir: './tests',
   timeout: 60000,
   expect: {
     timeout: 10000,
   },
-  fullyParallel: false, // Sequential execution for predictable rule & state evaluation
+  fullyParallel: false,
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 2 : 0,
   workers: 1,
+  outputDir: './reports/test-results',
   reporter: [
-    ['html', { outputFolder: 'reports/html', open: 'never' }],
-    ['list']
+    ['html', { outputFolder: 'reports/playwright-report', open: 'never' }],
+    ['list'],
+    ['json', { outputFile: 'reports/test-results/results.json' }]
   ],
   use: {
     baseURL: process.env.BASE_URL || 'http://localhost:7001',
-    trace: 'retain-on-failure',
+    apiBaseURL: process.env.API_URL || 'http://localhost:7002/api',
+    trace: 'on-first-retry',
     screenshot: 'only-on-failure',
-    video: 'retain-on-failure',
+    video: 'on-first-retry',
     actionTimeout: 15000,
     navigationTimeout: 30000,
+    ignoreHTTPSErrors: true,
   },
-  outputDir: 'reports/artifacts',
+
   projects: [
     {
       name: 'chromium',
@@ -41,3 +45,5 @@ module.exports = defineConfig({
     },
   ],
 });
+
+

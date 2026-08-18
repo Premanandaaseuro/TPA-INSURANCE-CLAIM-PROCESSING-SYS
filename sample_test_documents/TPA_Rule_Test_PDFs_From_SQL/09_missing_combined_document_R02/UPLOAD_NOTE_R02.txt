@@ -1,0 +1,1 @@
+R02 is a missing-document rule. To trigger R02, upload ONLY the Claim Form from this folder. Do NOT upload a second document. This intentionally tests the mandatory missing combined-document validation.

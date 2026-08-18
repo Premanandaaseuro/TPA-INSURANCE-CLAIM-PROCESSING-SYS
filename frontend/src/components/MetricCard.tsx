@@ -18,12 +18,13 @@ export const MetricCard: React.FC<MetricCardProps> = ({
   iconBg,
   iconColor,
 }) => {
+  const testId = `metric-card-${title.toLowerCase().replace(/\s+/g, '-')}`;
   return (
-    <div className="bg-white rounded-2xl p-5 border border-slate-200 shadow-sm hover:shadow-md transition-shadow">
+    <div className="bg-white rounded-2xl p-5 border border-slate-200 shadow-sm hover:shadow-md transition-shadow" data-testid={testId}>
       <div className="flex items-center justify-between">
         <div>
           <p className="text-xs font-medium text-slate-500 uppercase tracking-wider">{title}</p>
-          <p className="text-2xl font-extrabold text-slate-900 mt-1">{value}</p>
+          <p className="text-2xl font-extrabold text-slate-900 mt-1" data-testid={`${testId}-value`}>{value}</p>
           {subtitle && <p className="text-xs text-slate-500 mt-1 font-medium">{subtitle}</p>}
         </div>
         <div className={`p-3.5 rounded-xl ${iconBg} ${iconColor}`}>

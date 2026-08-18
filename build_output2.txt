@@ -1,0 +1,350 @@
+[INFO] Scanning for projects...
+[INFO] 
+[INFO] --------------------< com.tpa:tpa-claim-processor >---------------------
+[INFO] Building tpa-claim-processor 1.0.0-SNAPSHOT
+[INFO]   from pom.xml
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO] 
+[INFO] --- clean:3.4.1:clean (default-clean) @ tpa-claim-processor ---
+[INFO] Deleting c:\Users\MPremananda\Desktop\TPA Insurance Claim Processing System\target
+[INFO] 
+[INFO] --- resources:3.3.1:resources (default-resources) @ tpa-claim-processor ---
+[INFO] Copying 2 resources from src\main\resources to target\classes
+[INFO] Copying 11 resources from src\main\resources to target\classes
+[INFO] 
+[INFO] --- compiler:3.13.0:compile (default-compile) @ tpa-claim-processor ---
+[INFO] Recompiling the module because of changed source code.
+[INFO] Compiling 55 source files with javac [debug parameters release 21] to target\classes
+[INFO] 
+[INFO] --- resources:3.3.1:testResources (default-testResources) @ tpa-claim-processor ---
+[INFO] Copying 1 resource from src\test\resources to target\test-classes
+[INFO] 
+[INFO] --- compiler:3.13.0:testCompile (default-testCompile) @ tpa-claim-processor ---
+[INFO] Recompiling the module because of changed dependency.
+[INFO] Compiling 14 source files with javac [debug parameters release 21] to target\test-classes
+[WARNING] /c:/Users/MPremananda/Desktop/TPA Insurance Claim Processing System/src/test/java/com/tpa/claimprocessor/service/ClaimServiceTest.java:[41,6] org.springframework.boot.test.mock.mockito.MockBean in org.springframework.boot.test.mock.mockito has been deprecated and marked for removal
+[WARNING] /c:/Users/MPremananda/Desktop/TPA Insurance Claim Processing System/src/test/java/com/tpa/claimprocessor/service/ClaimServiceTest.java:[44,6] org.springframework.boot.test.mock.mockito.MockBean in org.springframework.boot.test.mock.mockito has been deprecated and marked for removal
+[WARNING] /c:/Users/MPremananda/Desktop/TPA Insurance Claim Processing System/src/test/java/com/tpa/claimprocessor/service/ClaimServiceTest.java:[47,6] org.springframework.boot.test.mock.mockito.MockBean in org.springframework.boot.test.mock.mockito has been deprecated and marked for removal
+[WARNING] /c:/Users/MPremananda/Desktop/TPA Insurance Claim Processing System/src/test/java/com/tpa/claimprocessor/service/ClaimServiceTest.java:[50,6] org.springframework.boot.test.mock.mockito.MockBean in org.springframework.boot.test.mock.mockito has been deprecated and marked for removal
+[WARNING] /c:/Users/MPremananda/Desktop/TPA Insurance Claim Processing System/src/test/java/com/tpa/claimprocessor/service/ClaimServiceTest.java:[53,6] org.springframework.boot.test.mock.mockito.MockBean in org.springframework.boot.test.mock.mockito has been deprecated and marked for removal
+[WARNING] /c:/Users/MPremananda/Desktop/TPA Insurance Claim Processing System/src/test/java/com/tpa/claimprocessor/service/ClaimServiceTest.java:[56,6] org.springframework.boot.test.mock.mockito.MockBean in org.springframework.boot.test.mock.mockito has been deprecated and marked for removal
+[WARNING] /c:/Users/MPremananda/Desktop/TPA Insurance Claim Processing System/src/test/java/com/tpa/claimprocessor/service/ClaimServiceTest.java:[59,6] org.springframework.boot.test.mock.mockito.MockBean in org.springframework.boot.test.mock.mockito has been deprecated and marked for removal
+[INFO] /c:/Users/MPremananda/Desktop/TPA Insurance Claim Processing System/src/test/java/com/tpa/claimprocessor/scripts/DecisionUIVerificationScript.java: c:\Users\MPremananda\Desktop\TPA Insurance Claim Processing System\src\test\java\com\tpa\claimprocessor\scripts\DecisionUIVerificationScript.java uses or overrides a deprecated API.
+[INFO] /c:/Users/MPremananda/Desktop/TPA Insurance Claim Processing System/src/test/java/com/tpa/claimprocessor/scripts/DecisionUIVerificationScript.java: Recompile with -Xlint:deprecation for details.
+[INFO] 
+[INFO] --- surefire:3.5.2:test (default-test) @ tpa-claim-processor ---
+[INFO] Using auto detected provider org.apache.maven.surefire.junitplatform.JUnitPlatformProvider
+[INFO] 
+[INFO] -------------------------------------------------------
+[INFO]  T E S T S
+[INFO] -------------------------------------------------------
+[INFO] Running com.tpa.claimprocessor.controller.ClaimControllerIntegrationTest
+Standard Commons Logging discovery in action with spring-jcl: please remove commons-logging.jar from classpath in order to avoid potential conflicts
+15:24:25.961 [main] INFO org.springframework.test.context.support.AnnotationConfigContextLoaderUtils -- Could not detect default configuration classes for test class [com.tpa.claimprocessor.controller.ClaimControllerIntegrationTest]: ClaimControllerIntegrationTest does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
+15:24:26.916 [main] INFO org.springframework.boot.test.context.SpringBootTestContextBootstrapper -- Found @SpringBootConfiguration com.tpa.claimprocessor.TpaClaimProcessorApplication for test class com.tpa.claimprocessor.controller.ClaimControllerIntegrationTest
+15:24:27.692 [main] INFO org.springframework.boot.devtools.restart.RestartApplicationListener -- Restart disabled due to context in which it is running
+
+  .   ____          _            __ _ _
+ /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
+( ( )\___ | '_ | '_| | '_ \/ _` | \ \ \ \
+ \\/  ___)| |_)| | | | | || (_| |  ) ) ) )
+  '  |____| .__|_| |_|_| |_\__, | / / / /
+ =========|_|==============|___/=/_/_/_/
+
+ :: Spring Boot ::                (v3.4.3)
+
+2026-08-14T15:24:29.135+05:30  INFO 13124 --- [tpa-claim-processor-test] [           main] c.t.c.c.ClaimControllerIntegrationTest   : Starting ClaimControllerIntegrationTest using Java 26.0.2 with PID 13124 (started by MPremananda in c:\Users\MPremananda\Desktop\TPA Insurance Claim Processing System)
+2026-08-14T15:24:29.139+05:30  INFO 13124 --- [tpa-claim-processor-test] [           main] c.t.c.c.ClaimControllerIntegrationTest   : The following 1 profile is active: "test"
+2026-08-14T15:24:32.449+05:30  INFO 13124 --- [tpa-claim-processor-test] [           main] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2026-08-14T15:24:32.952+05:30  INFO 13124 --- [tpa-claim-processor-test] [           main] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 458 ms. Found 4 JPA repository interfaces.
+2026-08-14T15:24:34.674+05:30  INFO 13124 --- [tpa-claim-processor-test] [           main] o.hibernate.jpa.internal.util.LogHelper  : HHH000204: Processing PersistenceUnitInfo [name: default]
+2026-08-14T15:24:34.881+05:30  INFO 13124 --- [tpa-claim-processor-test] [           main] org.hibernate.Version                    : HHH000412: Hibernate ORM core version 6.6.8.Final
+2026-08-14T15:24:34.976+05:30  INFO 13124 --- [tpa-claim-processor-test] [           main] o.h.c.internal.RegionFactoryInitiator    : HHH000026: Second-level cache disabled
+2026-08-14T15:24:35.756+05:30  INFO 13124 --- [tpa-claim-processor-test] [           main] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
+2026-08-14T15:24:35.829+05:30  INFO 13124 --- [tpa-claim-processor-test] [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
+2026-08-14T15:24:36.143+05:30  INFO 13124 --- [tpa-claim-processor-test] [           main] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Added connection conn0: url=jdbc:h2:mem:tpa_test_db user=SA
+2026-08-14T15:24:36.146+05:30  INFO 13124 --- [tpa-claim-processor-test] [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
+2026-08-14T15:24:36.191+05:30  WARN 13124 --- [tpa-claim-processor-test] [           main] org.hibernate.dialect.Dialect            : HHH000511: The 2.3.232 version for [org.hibernate.dialect.PostgreSQLDialect] is no longer supported, hence certain features may not work properly. The minimum supported version is 12.0.0. Check the community dialects project for available legacy versions.
+2026-08-14T15:24:36.206+05:30  WARN 13124 --- [tpa-claim-processor-test] [           main] org.hibernate.orm.deprecation            : HHH90000025: PostgreSQLDialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
+2026-08-14T15:24:36.244+05:30  INFO 13124 --- [tpa-claim-processor-test] [           main] org.hibernate.orm.connections.pooling    : HHH10001005: Database info:
+	Database JDBC URL [Connecting through datasource 'HikariDataSource (HikariPool-1)']
+	Database driver: undefined/unknown
+	Database version: 2.3.232
+	Autocommit mode: undefined/unknown
+	Isolation level: undefined/unknown
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+2026-08-14T15:24:37.735+05:30  INFO 13124 --- [tpa-claim-processor-test] [           main] o.h.e.t.j.p.i.JtaPlatformInitiator       : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2026-08-14T15:24:37.836+05:30  INFO 13124 --- [tpa-claim-processor-test] [           main] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+2026-08-14T15:24:38.494+05:30  INFO 13124 --- [tpa-claim-processor-test] [           main] o.s.d.j.r.query.QueryEnhancerFactory     : Hibernate is in classpath; If applicable, HQL parser will be used.
+2026-08-14T15:24:40.403+05:30  WARN 13124 --- [tpa-claim-processor-test] [           main] JpaBaseConfiguration$JpaWebConfiguration : spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2026-08-14T15:24:40.451+05:30  INFO 13124 --- [tpa-claim-processor-test] [           main] o.s.b.a.w.s.WelcomePageHandlerMapping    : Adding welcome page: class path resource [static/index.html]
+2026-08-14T15:24:41.377+05:30  INFO 13124 --- [tpa-claim-processor-test] [           main] o.s.b.t.m.w.SpringBootMockServletContext : Initializing Spring TestDispatcherServlet ''
+2026-08-14T15:24:41.378+05:30  INFO 13124 --- [tpa-claim-processor-test] [           main] o.s.t.web.servlet.TestDispatcherServlet  : Initializing Servlet ''
+2026-08-14T15:24:41.381+05:30  INFO 13124 --- [tpa-claim-processor-test] [           main] o.s.t.web.servlet.TestDispatcherServlet  : Completed initialization in 2 ms
+2026-08-14T15:24:41.428+05:30  INFO 13124 --- [tpa-claim-processor-test] [           main] c.t.c.c.ClaimControllerIntegrationTest   : Started ClaimControllerIntegrationTest in 13.843 seconds (process running for 19.703)
+2026-08-14T15:24:43.179+05:30  INFO 13124 --- [tpa-claim-processor-test] [           main] c.t.c.service.ClaimServiceImpl           : EXTRACTED POLICY NUMBER FROM CLAIM FORM = POL-2026-8899
+2026-08-14T15:24:43.615+05:30  INFO 13124 --- [tpa-claim-processor-test] [           main] c.t.c.service.ClaimServiceImpl           : EXTRACTED POLICY NUMBER FROM CLAIM FORM = POL-2026-8899
+[INFO] Tests run: 2, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 18.45 s -- in com.tpa.claimprocessor.controller.ClaimControllerIntegrationTest
+[INFO] Running com.tpa.claimprocessor.controller.ControllerIntegrationTest
+2026-08-14T15:24:43.719+05:30  INFO 13124 --- [tpa-claim-processor-test] [           main] t.c.s.AnnotationConfigContextLoaderUtils : Could not detect default configuration classes for test class [com.tpa.claimprocessor.controller.ControllerIntegrationTest]: ControllerIntegrationTest does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
+2026-08-14T15:24:43.723+05:30  INFO 13124 --- [tpa-claim-processor-test] [           main] .b.t.c.SpringBootTestContextBootstrapper : Found @SpringBootConfiguration com.tpa.claimprocessor.TpaClaimProcessorApplication for test class com.tpa.claimprocessor.controller.ControllerIntegrationTest
+2026-08-14T15:24:43.731+05:30  INFO 13124 --- [tpa-claim-processor-test] [           main] o.s.b.d.r.RestartApplicationListener     : Restart disabled due to context in which it is running
+
+  .   ____          _            __ _ _
+ /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
+( ( )\___ | '_ | '_| | '_ \/ _` | \ \ \ \
+ \\/  ___)| |_)| | | | | || (_| |  ) ) ) )
+  '  |____| .__|_| |_|_| |_\__, | / / / /
+ =========|_|==============|___/=/_/_/_/
+
+ :: Spring Boot ::                (v3.4.3)
+
+2026-08-14T15:24:43.790+05:30  INFO 13124 --- [tpa-claim-processor-test] [           main] c.t.c.c.ControllerIntegrationTest        : Starting ControllerIntegrationTest using Java 26.0.2 with PID 13124 (started by MPremananda in c:\Users\MPremananda\Desktop\TPA Insurance Claim Processing System)
+2026-08-14T15:24:43.790+05:30  INFO 13124 --- [tpa-claim-processor-test] [           main] c.t.c.c.ControllerIntegrationTest        : The following 1 profile is active: "test"
+2026-08-14T15:24:44.189+05:30  INFO 13124 --- [tpa-claim-processor-test] [           main] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2026-08-14T15:24:44.236+05:30  INFO 13124 --- [tpa-claim-processor-test] [           main] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 45 ms. Found 4 JPA repository interfaces.
+2026-08-14T15:24:44.385+05:30  INFO 13124 --- [tpa-claim-processor-test] [           main] o.hibernate.jpa.internal.util.LogHelper  : HHH000204: Processing PersistenceUnitInfo [name: default]
+2026-08-14T15:24:44.392+05:30  INFO 13124 --- [tpa-claim-processor-test] [           main] o.h.c.internal.RegionFactoryInitiator    : HHH000026: Second-level cache disabled
+2026-08-14T15:24:44.413+05:30  INFO 13124 --- [tpa-claim-processor-test] [           main] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
+2026-08-14T15:24:44.415+05:30  INFO 13124 --- [tpa-claim-processor-test] [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-2 - Starting...
+2026-08-14T15:24:44.417+05:30  INFO 13124 --- [tpa-claim-processor-test] [           main] com.zaxxer.hikari.pool.HikariPool        : HikariPool-2 - Added connection conn10: url=jdbc:h2:mem:tpa_test_db user=SA
+2026-08-14T15:24:44.417+05:30  INFO 13124 --- [tpa-claim-processor-test] [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-2 - Start completed.
+2026-08-14T15:24:44.418+05:30  WARN 13124 --- [tpa-claim-processor-test] [           main] org.hibernate.dialect.Dialect            : HHH000511: The 2.3.232 version for [org.hibernate.dialect.PostgreSQLDialect] is no longer supported, hence certain features may not work properly. The minimum supported version is 12.0.0. Check the community dialects project for available legacy versions.
+2026-08-14T15:24:44.418+05:30  WARN 13124 --- [tpa-claim-processor-test] [           main] org.hibernate.orm.deprecation            : HHH90000025: PostgreSQLDialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
+2026-08-14T15:24:44.419+05:30  INFO 13124 --- [tpa-claim-processor-test] [           main] org.hibernate.orm.connections.pooling    : HHH10001005: Database info:
+	Database JDBC URL [Connecting through datasource 'HikariDataSource (HikariPool-2)']
+	Database driver: undefined/unknown
+	Database version: 2.3.232
+	Autocommit mode: undefined/unknown
+	Isolation level: undefined/unknown
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+2026-08-14T15:24:44.788+05:30  INFO 13124 --- [tpa-claim-processor-test] [           main] o.h.e.t.j.p.i.JtaPlatformInitiator       : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2026-08-14T15:24:44.834+05:30  INFO 13124 --- [tpa-claim-processor-test] [           main] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+2026-08-14T15:24:45.016+05:30  WARN 13124 --- [tpa-claim-processor-test] [           main] JpaBaseConfiguration$JpaWebConfiguration : spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2026-08-14T15:24:45.025+05:30  INFO 13124 --- [tpa-claim-processor-test] [           main] o.s.b.a.w.s.WelcomePageHandlerMapping    : Adding welcome page: class path resource [static/index.html]
+2026-08-14T15:24:45.203+05:30  INFO 13124 --- [tpa-claim-processor-test] [           main] c.t.c.c.ControllerIntegrationTest        : Started ControllerIntegrationTest in 1.473 seconds (process running for 23.478)
+[INFO] Tests run: 26, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 1.980 s -- in com.tpa.claimprocessor.controller.ControllerIntegrationTest
+[INFO] Running com.tpa.claimprocessor.export.PdfExportServiceTest
+2026-08-14T15:24:45.710+05:30  INFO 13124 --- [tpa-claim-processor-test] [           main] t.c.s.AnnotationConfigContextLoaderUtils : Could not detect default configuration classes for test class [com.tpa.claimprocessor.export.PdfExportServiceTest]: PdfExportServiceTest does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
+2026-08-14T15:24:45.745+05:30  INFO 13124 --- [tpa-claim-processor-test] [           main] .b.t.c.SpringBootTestContextBootstrapper : Found @SpringBootConfiguration com.tpa.claimprocessor.TpaClaimProcessorApplication for test class com.tpa.claimprocessor.export.PdfExportServiceTest
+[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.316 s -- in com.tpa.claimprocessor.export.PdfExportServiceTest
+[INFO] Running com.tpa.claimprocessor.extraction.DocumentProcessingPipelineTest
+2026-08-14T15:24:46.026+05:30  INFO 13124 --- [tpa-claim-processor-test] [           main] t.c.s.AnnotationConfigContextLoaderUtils : Could not detect default configuration classes for test class [com.tpa.claimprocessor.extraction.DocumentProcessingPipelineTest]: DocumentProcessingPipelineTest does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
+2026-08-14T15:24:46.064+05:30  INFO 13124 --- [tpa-claim-processor-test] [           main] .b.t.c.SpringBootTestContextBootstrapper : Found @SpringBootConfiguration com.tpa.claimprocessor.TpaClaimProcessorApplication for test class com.tpa.claimprocessor.extraction.DocumentProcessingPipelineTest
+2026-08-14T15:24:46.180+05:30  INFO 13124 --- [tpa-claim-processor-test] [           main] c.t.c.service.ClaimServiceImpl           : EXTRACTED POLICY NUMBER FROM CLAIM FORM = POL-10001
+[INFO] Tests run: 2, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.272 s -- in com.tpa.claimprocessor.extraction.DocumentProcessingPipelineTest
+[INFO] Running com.tpa.claimprocessor.extraction.ExtractionComprehensiveTest
+2026-08-14T15:24:46.302+05:30  INFO 13124 --- [tpa-claim-processor-test] [           main] t.c.s.AnnotationConfigContextLoaderUtils : Could not detect default configuration classes for test class [com.tpa.claimprocessor.extraction.ExtractionComprehensiveTest]: ExtractionComprehensiveTest does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
+2026-08-14T15:24:46.306+05:30  INFO 13124 --- [tpa-claim-processor-test] [           main] .b.t.c.SpringBootTestContextBootstrapper : Found @SpringBootConfiguration com.tpa.claimprocessor.TpaClaimProcessorApplication for test class com.tpa.claimprocessor.extraction.ExtractionComprehensiveTest
+[ERROR] Tests run: 26, Failures: 7, Errors: 0, Skipped: 0, Time elapsed: 0.255 s <<< FAILURE! -- in com.tpa.claimprocessor.extraction.ExtractionComprehensiveTest
+[ERROR] com.tpa.claimprocessor.extraction.ExtractionComprehensiveTest.testParseValidJsonData -- Time elapsed: 0.022 s <<< FAILURE!
+org.opentest4j.AssertionFailedError: expected: <POL-2026-001> but was: <ber>
+	at org.junit.jupiter.api.AssertionFailureBuilder.build(AssertionFailureBuilder.java:151)
+	at org.junit.jupiter.api.AssertionFailureBuilder.buildAndThrow(AssertionFailureBuilder.java:132)
+	at org.junit.jupiter.api.AssertEquals.failNotEqual(AssertEquals.java:197)
+	at org.junit.jupiter.api.AssertEquals.assertEquals(AssertEquals.java:182)
+	at org.junit.jupiter.api.AssertEquals.assertEquals(AssertEquals.java:177)
+	at org.junit.jupiter.api.Assertions.assertEquals(Assertions.java:1145)
+	at com.tpa.claimprocessor.extraction.ExtractionComprehensiveTest.testParseValidJsonData(ExtractionComprehensiveTest.java:40)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:565)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1612)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1612)
+
+[ERROR] com.tpa.claimprocessor.extraction.ExtractionComprehensiveTest.testParseSpecialCharacters -- Time elapsed: 0.010 s <<< FAILURE!
+org.opentest4j.AssertionFailedError: expected: <José María O'Brien-Schmidt> but was: <null>
+	at org.junit.jupiter.api.AssertionFailureBuilder.build(AssertionFailureBuilder.java:151)
+	at org.junit.jupiter.api.AssertionFailureBuilder.buildAndThrow(AssertionFailureBuilder.java:132)
+	at org.junit.jupiter.api.AssertEquals.failNotEqual(AssertEquals.java:197)
+	at org.junit.jupiter.api.AssertEquals.assertEquals(AssertEquals.java:182)
+	at org.junit.jupiter.api.AssertEquals.assertEquals(AssertEquals.java:177)
+	at org.junit.jupiter.api.Assertions.assertEquals(Assertions.java:1145)
+	at com.tpa.claimprocessor.extraction.ExtractionComprehensiveTest.testParseSpecialCharacters(ExtractionComprehensiveTest.java:118)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:565)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1612)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1612)
+
+[ERROR] com.tpa.claimprocessor.extraction.ExtractionComprehensiveTest.testParseWithWhitespace -- Time elapsed: 0.005 s <<< FAILURE!
+org.opentest4j.AssertionFailedError: expected: <POL-2026-001> but was: <ber>
+	at org.junit.jupiter.api.AssertionFailureBuilder.build(AssertionFailureBuilder.java:151)
+	at org.junit.jupiter.api.AssertionFailureBuilder.buildAndThrow(AssertionFailureBuilder.java:132)
+	at org.junit.jupiter.api.AssertEquals.failNotEqual(AssertEquals.java:197)
+	at org.junit.jupiter.api.AssertEquals.assertEquals(AssertEquals.java:182)
+	at org.junit.jupiter.api.AssertEquals.assertEquals(AssertEquals.java:177)
+	at org.junit.jupiter.api.Assertions.assertEquals(Assertions.java:1145)
+	at com.tpa.claimprocessor.extraction.ExtractionComprehensiveTest.testParseWithWhitespace(ExtractionComprehensiveTest.java:138)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:565)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1612)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1612)
+
+[ERROR] com.tpa.claimprocessor.extraction.ExtractionComprehensiveTest.testParseWithMissingFields -- Time elapsed: 0.008 s <<< FAILURE!
+org.opentest4j.AssertionFailedError: expected: <POL-2026-001> but was: <ber>
+	at org.junit.jupiter.api.AssertionFailureBuilder.build(AssertionFailureBuilder.java:151)
+	at org.junit.jupiter.api.AssertionFailureBuilder.buildAndThrow(AssertionFailureBuilder.java:132)
+	at org.junit.jupiter.api.AssertEquals.failNotEqual(AssertEquals.java:197)
+	at org.junit.jupiter.api.AssertEquals.assertEquals(AssertEquals.java:182)
+	at org.junit.jupiter.api.AssertEquals.assertEquals(AssertEquals.java:177)
+	at org.junit.jupiter.api.Assertions.assertEquals(Assertions.java:1145)
+	at com.tpa.claimprocessor.extraction.ExtractionComprehensiveTest.testParseWithMissingFields(ExtractionComprehensiveTest.java:63)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:565)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1612)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1612)
+
+[ERROR] com.tpa.claimprocessor.extraction.ExtractionComprehensiveTest.testParseHospitalNames -- Time elapsed: 0.008 s <<< FAILURE!
+org.opentest4j.AssertionFailedError: expected: not <null>
+	at org.junit.jupiter.api.AssertionFailureBuilder.build(AssertionFailureBuilder.java:152)
+	at org.junit.jupiter.api.AssertionFailureBuilder.buildAndThrow(AssertionFailureBuilder.java:132)
+	at org.junit.jupiter.api.AssertNotNull.failNull(AssertNotNull.java:49)
+	at org.junit.jupiter.api.AssertNotNull.assertNotNull(AssertNotNull.java:35)
+	at org.junit.jupiter.api.AssertNotNull.assertNotNull(AssertNotNull.java:30)
+	at org.junit.jupiter.api.Assertions.assertNotNull(Assertions.java:304)
+	at com.tpa.claimprocessor.extraction.ExtractionComprehensiveTest.testParseHospitalNames(ExtractionComprehensiveTest.java:128)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:565)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1612)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1612)
+
+[ERROR] com.tpa.claimprocessor.extraction.ExtractionComprehensiveTest.testParseDataWithDates -- Time elapsed: 0.008 s <<< FAILURE!
+org.opentest4j.AssertionFailedError: expected: not <null>
+	at org.junit.jupiter.api.AssertionFailureBuilder.build(AssertionFailureBuilder.java:152)
+	at org.junit.jupiter.api.AssertionFailureBuilder.buildAndThrow(AssertionFailureBuilder.java:132)
+	at org.junit.jupiter.api.AssertNotNull.failNull(AssertNotNull.java:49)
+	at org.junit.jupiter.api.AssertNotNull.assertNotNull(AssertNotNull.java:35)
+	at org.junit.jupiter.api.AssertNotNull.assertNotNull(AssertNotNull.java:30)
+	at org.junit.jupiter.api.Assertions.assertNotNull(Assertions.java:304)
+	at com.tpa.claimprocessor.extraction.ExtractionComprehensiveTest.testParseDataWithDates(ExtractionComprehensiveTest.java:52)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:565)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1612)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1612)
+
+[ERROR] com.tpa.claimprocessor.extraction.ExtractionComprehensiveTest.testParseLargeAmounts -- Time elapsed: 0.007 s <<< FAILURE!
+org.opentest4j.AssertionFailedError: expected: <POL-2026-001> but was: <ber>
+	at org.junit.jupiter.api.AssertionFailureBuilder.build(AssertionFailureBuilder.java:151)
+	at org.junit.jupiter.api.AssertionFailureBuilder.buildAndThrow(AssertionFailureBuilder.java:132)
+	at org.junit.jupiter.api.AssertEquals.failNotEqual(AssertEquals.java:197)
+	at org.junit.jupiter.api.AssertEquals.assertEquals(AssertEquals.java:182)
+	at org.junit.jupiter.api.AssertEquals.assertEquals(AssertEquals.java:177)
+	at org.junit.jupiter.api.Assertions.assertEquals(Assertions.java:1145)
+	at com.tpa.claimprocessor.extraction.ExtractionComprehensiveTest.testParseLargeAmounts(ExtractionComprehensiveTest.java:97)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:565)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1612)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1612)
+
+[INFO] Running com.tpa.claimprocessor.extraction.StructuredDataParserTest
+[INFO] Tests run: 3, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.015 s -- in com.tpa.claimprocessor.extraction.StructuredDataParserTest
+[INFO] Running com.tpa.claimprocessor.rules.R06R07RectificationTest
+[INFO] Tests run: 11, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.461 s -- in com.tpa.claimprocessor.rules.R06R07RectificationTest
+[INFO] Running com.tpa.claimprocessor.rules.RuleEngineAuditTest
+2026-08-14T15:24:47.044+05:30  INFO 13124 --- [tpa-claim-processor-test] [           main] t.c.s.AnnotationConfigContextLoaderUtils : Could not detect default configuration classes for test class [com.tpa.claimprocessor.rules.RuleEngineAuditTest]: RuleEngineAuditTest does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
+2026-08-14T15:24:47.069+05:30  INFO 13124 --- [tpa-claim-processor-test] [           main] .b.t.c.SpringBootTestContextBootstrapper : Found @SpringBootConfiguration com.tpa.claimprocessor.TpaClaimProcessorApplication for test class com.tpa.claimprocessor.rules.RuleEngineAuditTest
+[INFO] Running com.tpa.claimprocessor.rules.RuleEngineAuditTest$RuleCombinationsAndPriority
+2026-08-14T15:24:47.078+05:30  INFO 13124 --- [tpa-claim-processor-test] [           main] t.c.s.AnnotationConfigContextLoaderUtils : Could not detect default configuration classes for test class [com.tpa.claimprocessor.rules.RuleEngineAuditTest$RuleCombinationsAndPriority]: RuleCombinationsAndPriority does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
+2026-08-14T15:24:47.081+05:30  INFO 13124 --- [tpa-claim-processor-test] [           main] .b.t.c.SpringBootTestContextBootstrapper : Found @SpringBootConfiguration com.tpa.claimprocessor.TpaClaimProcessorApplication for test class com.tpa.claimprocessor.rules.RuleEngineAuditTest$RuleCombinationsAndPriority
+[INFO] Tests run: 7, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.125 s -- in com.tpa.claimprocessor.rules.RuleEngineAuditTest$RuleCombinationsAndPriority
+[INFO] Running com.tpa.claimprocessor.rules.RuleEngineAuditTest$IndividualRuleAudits
+2026-08-14T15:24:47.204+05:30  INFO 13124 --- [tpa-claim-processor-test] [           main] t.c.s.AnnotationConfigContextLoaderUtils : Could not detect default configuration classes for test class [com.tpa.claimprocessor.rules.RuleEngineAuditTest$IndividualRuleAudits]: IndividualRuleAudits does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
+2026-08-14T15:24:47.211+05:30  INFO 13124 --- [tpa-claim-processor-test] [           main] .b.t.c.SpringBootTestContextBootstrapper : Found @SpringBootConfiguration com.tpa.claimprocessor.TpaClaimProcessorApplication for test class com.tpa.claimprocessor.rules.RuleEngineAuditTest$IndividualRuleAudits
+[INFO] Tests run: 10, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.135 s -- in com.tpa.claimprocessor.rules.RuleEngineAuditTest$IndividualRuleAudits
+[INFO] Tests run: 0, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.296 s -- in com.tpa.claimprocessor.rules.RuleEngineAuditTest
+[INFO] Running com.tpa.claimprocessor.rules.RulesComprehensiveTest
+2026-08-14T15:24:47.344+05:30  INFO 13124 --- [tpa-claim-processor-test] [           main] t.c.s.AnnotationConfigContextLoaderUtils : Could not detect default configuration classes for test class [com.tpa.claimprocessor.rules.RulesComprehensiveTest]: RulesComprehensiveTest does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
+2026-08-14T15:24:47.347+05:30  INFO 13124 --- [tpa-claim-processor-test] [           main] .b.t.c.SpringBootTestContextBootstrapper : Found @SpringBootConfiguration com.tpa.claimprocessor.TpaClaimProcessorApplication for test class com.tpa.claimprocessor.rules.RulesComprehensiveTest
+[INFO] Tests run: 19, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.271 s -- in com.tpa.claimprocessor.rules.RulesComprehensiveTest
+[INFO] Running com.tpa.claimprocessor.service.ClaimServiceTest
+2026-08-14T15:24:47.622+05:30  INFO 13124 --- [tpa-claim-processor-test] [           main] t.c.s.AnnotationConfigContextLoaderUtils : Could not detect default configuration classes for test class [com.tpa.claimprocessor.service.ClaimServiceTest]: ClaimServiceTest does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
+2026-08-14T15:24:47.662+05:30  INFO 13124 --- [tpa-claim-processor-test] [           main] .b.t.c.SpringBootTestContextBootstrapper : Found @SpringBootConfiguration com.tpa.claimprocessor.TpaClaimProcessorApplication for test class com.tpa.claimprocessor.service.ClaimServiceTest
+2026-08-14T15:24:47.670+05:30  INFO 13124 --- [tpa-claim-processor-test] [           main] o.s.b.d.r.RestartApplicationListener     : Restart disabled due to context in which it is running
+
+  .   ____          _            __ _ _
+ /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
+( ( )\___ | '_ | '_| | '_ \/ _` | \ \ \ \
+ \\/  ___)| |_)| | | | | || (_| |  ) ) ) )
+  '  |____| .__|_| |_|_| |_\__, | / / / /
+ =========|_|==============|___/=/_/_/_/
+
+ :: Spring Boot ::                (v3.4.3)
+
+2026-08-14T15:24:47.756+05:30  INFO 13124 --- [tpa-claim-processor-test] [           main] c.t.c.service.ClaimServiceTest           : Starting ClaimServiceTest using Java 26.0.2 with PID 13124 (started by MPremananda in c:\Users\MPremananda\Desktop\TPA Insurance Claim Processing System)
+2026-08-14T15:24:47.756+05:30  INFO 13124 --- [tpa-claim-processor-test] [           main] c.t.c.service.ClaimServiceTest           : The following 1 profile is active: "test"
+2026-08-14T15:24:48.267+05:30  INFO 13124 --- [tpa-claim-processor-test] [           main] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2026-08-14T15:24:48.335+05:30  INFO 13124 --- [tpa-claim-processor-test] [           main] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 65 ms. Found 4 JPA repository interfaces.
+2026-08-14T15:24:48.887+05:30  INFO 13124 --- [tpa-claim-processor-test] [           main] o.hibernate.jpa.internal.util.LogHelper  : HHH000204: Processing PersistenceUnitInfo [name: default]
+2026-08-14T15:24:48.892+05:30  INFO 13124 --- [tpa-claim-processor-test] [           main] o.h.c.internal.RegionFactoryInitiator    : HHH000026: Second-level cache disabled
+2026-08-14T15:24:48.906+05:30  INFO 13124 --- [tpa-claim-processor-test] [           main] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
+2026-08-14T15:24:48.908+05:30  INFO 13124 --- [tpa-claim-processor-test] [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-3 - Starting...
+2026-08-14T15:24:48.910+05:30  INFO 13124 --- [tpa-claim-processor-test] [           main] com.zaxxer.hikari.pool.HikariPool        : HikariPool-3 - Added connection conn20: url=jdbc:h2:mem:tpa_test_db user=SA
+2026-08-14T15:24:48.910+05:30  INFO 13124 --- [tpa-claim-processor-test] [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-3 - Start completed.
+2026-08-14T15:24:48.910+05:30  WARN 13124 --- [tpa-claim-processor-test] [           main] org.hibernate.dialect.Dialect            : HHH000511: The 2.3.232 version for [org.hibernate.dialect.PostgreSQLDialect] is no longer supported, hence certain features may not work properly. The minimum supported version is 12.0.0. Check the community dialects project for available legacy versions.
+2026-08-14T15:24:48.911+05:30  WARN 13124 --- [tpa-claim-processor-test] [           main] org.hibernate.orm.deprecation            : HHH90000025: PostgreSQLDialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
+2026-08-14T15:24:48.911+05:30  INFO 13124 --- [tpa-claim-processor-test] [           main] org.hibernate.orm.connections.pooling    : HHH10001005: Database info:
+	Database JDBC URL [Connecting through datasource 'HikariDataSource (HikariPool-3)']
+	Database driver: undefined/unknown
+	Database version: 2.3.232
+	Autocommit mode: undefined/unknown
+	Isolation level: undefined/unknown
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+2026-08-14T15:24:49.103+05:30  INFO 13124 --- [tpa-claim-processor-test] [           main] o.h.e.t.j.p.i.JtaPlatformInitiator       : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2026-08-14T15:24:49.136+05:30  INFO 13124 --- [tpa-claim-processor-test] [           main] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+2026-08-14T15:24:49.215+05:30  WARN 13124 --- [tpa-claim-processor-test] [           main] JpaBaseConfiguration$JpaWebConfiguration : spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2026-08-14T15:24:49.223+05:30  INFO 13124 --- [tpa-claim-processor-test] [           main] o.s.b.a.w.s.WelcomePageHandlerMapping    : Adding welcome page: class path resource [static/index.html]
+2026-08-14T15:24:49.403+05:30  INFO 13124 --- [tpa-claim-processor-test] [           main] c.t.c.service.ClaimServiceTest           : Started ClaimServiceTest in 1.734 seconds (process running for 27.677)
+2026-08-14T15:24:49.428+05:30  INFO 13124 --- [tpa-claim-processor-test] [           main] c.t.c.service.ClaimServiceImpl           : EXTRACTED POLICY NUMBER FROM CLAIM FORM = null
+2026-08-14T15:24:49.453+05:30  INFO 13124 --- [tpa-claim-processor-test] [           main] c.t.c.service.ClaimServiceImpl           : EXTRACTED POLICY NUMBER FROM CLAIM FORM = null
+2026-08-14T15:24:49.467+05:30  INFO 13124 --- [tpa-claim-processor-test] [           main] c.t.c.service.ClaimServiceImpl           : EXTRACTED POLICY NUMBER FROM CLAIM FORM = null
+[INFO] Tests run: 4, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 1.861 s -- in com.tpa.claimprocessor.service.ClaimServiceTest
+[INFO] Running com.tpa.claimprocessor.TestPdfGenerator
+2026-08-14T15:24:49.484+05:30  WARN 13124 --- [tpa-claim-processor-test] [           main] org.apache.pdfbox.pdmodel.PDDocument     : You are overwriting the existing file ClaimForm_MissingPolicyNumber_R04.pdf, this will produce a corrupted file if you're also reading from it
+2026-08-14T15:24:49.489+05:30  WARN 13124 --- [tpa-claim-processor-test] [           main] org.apache.pdfbox.pdmodel.PDDocument     : You are overwriting the existing file ClaimForm_WithPolicyNumber_POL10008.pdf, this will produce a corrupted file if you're also reading from it
+2026-08-14T15:24:49.494+05:30  WARN 13124 --- [tpa-claim-processor-test] [           main] org.apache.pdfbox.pdmodel.PDDocument     : You are overwriting the existing file CombinedHospitalDoc_AnanyaDas.pdf, this will produce a corrupted file if you're also reading from it
+Generated Test PDFs successfully in: c:\Users\MPremananda\Desktop\TPA Insurance Claim Processing System\sample_test_documents
+[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.015 s -- in com.tpa.claimprocessor.TestPdfGenerator
+[INFO] Running com.tpa.claimprocessor.util.UtilityDatabaseTest
+2026-08-14T15:24:49.501+05:30  INFO 13124 --- [tpa-claim-processor-test] [           main] t.c.s.AnnotationConfigContextLoaderUtils : Could not detect default configuration classes for test class [com.tpa.claimprocessor.util.UtilityDatabaseTest]: UtilityDatabaseTest does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
+2026-08-14T15:24:49.513+05:30  INFO 13124 --- [tpa-claim-processor-test] [           main] .b.t.c.SpringBootTestContextBootstrapper : Found @SpringBootConfiguration com.tpa.claimprocessor.TpaClaimProcessorApplication for test class com.tpa.claimprocessor.util.UtilityDatabaseTest
+[ERROR] Tests run: 25, Failures: 1, Errors: 0, Skipped: 0, Time elapsed: 0.249 s <<< FAILURE! -- in com.tpa.claimprocessor.util.UtilityDatabaseTest
+[ERROR] com.tpa.claimprocessor.util.UtilityDatabaseTest.testPolicyExpirationDate -- Time elapsed: 0.010 s <<< FAILURE!
+org.opentest4j.AssertionFailedError: expected: <true> but was: <false>
+	at org.junit.jupiter.api.AssertionFailureBuilder.build(AssertionFailureBuilder.java:151)
+	at org.junit.jupiter.api.AssertionFailureBuilder.buildAndThrow(AssertionFailureBuilder.java:132)
+	at org.junit.jupiter.api.AssertTrue.failNotTrue(AssertTrue.java:63)
+	at org.junit.jupiter.api.AssertTrue.assertTrue(AssertTrue.java:36)
+	at org.junit.jupiter.api.AssertTrue.assertTrue(AssertTrue.java:31)
+	at org.junit.jupiter.api.Assertions.assertTrue(Assertions.java:183)
+	at com.tpa.claimprocessor.util.UtilityDatabaseTest.testPolicyExpirationDate(UtilityDatabaseTest.java:191)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:565)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1612)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1612)
+
+[INFO] 
+[INFO] Results:
+[INFO] 
+[ERROR] Failures: 
+[ERROR]   ExtractionComprehensiveTest.testParseDataWithDates:52 expected: not <null>
+[ERROR]   ExtractionComprehensiveTest.testParseHospitalNames:128 expected: not <null>
+[ERROR]   ExtractionComprehensiveTest.testParseLargeAmounts:97 expected: <POL-2026-001> but was: <ber>
+[ERROR]   ExtractionComprehensiveTest.testParseSpecialCharacters:118 expected: <José María O'Brien-Schmidt> but was: <null>
+[ERROR]   ExtractionComprehensiveTest.testParseValidJsonData:40 expected: <POL-2026-001> but was: <ber>
+[ERROR]   ExtractionComprehensiveTest.testParseWithMissingFields:63 expected: <POL-2026-001> but was: <ber>
+[ERROR]   ExtractionComprehensiveTest.testParseWithWhitespace:138 expected: <POL-2026-001> but was: <ber>
+[ERROR]   UtilityDatabaseTest.testPolicyExpirationDate:191 expected: <true> but was: <false>
+[INFO] 
+[ERROR] Tests run: 137, Failures: 8, Errors: 0, Skipped: 0
+[INFO] 
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD FAILURE
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time:  43.787 s
+[INFO] Finished at: 2026-08-14T15:24:49+05:30
+[INFO] ------------------------------------------------------------------------
+[ERROR] Failed to execute goal org.apache.maven.plugins:maven-surefire-plugin:3.5.2:test (default-test) on project tpa-claim-processor: There are test failures.
+[ERROR] 
+[ERROR] See c:\Users\MPremananda\Desktop\TPA Insurance Claim Processing System\target\surefire-reports for the individual test results.
+[ERROR] See dump files (if any exist) [date].dump, [date]-jvmRun[N].dump and [date].dumpstream.
+[ERROR] -> [Help 1]
+[ERROR] 
+[ERROR] To see the full stack trace of the errors, re-run Maven with the -e switch.
+[ERROR] Re-run Maven using the -X switch to enable full debug logging.
+[ERROR] 
+[ERROR] For more information about the errors and possible solutions, please read the following articles:
+[ERROR] [Help 1] http://cwiki.apache.org/confluence/display/MAVEN/MojoFailureException

@@ -1,8 +1,14 @@
 package com.tpa.claimprocessor.domain.entity;
 
-import jakarta.persistence.*;
 import java.math.BigDecimal;
 import java.time.LocalDate;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 
 @Entity
 @Table(name = "policies")
@@ -131,5 +137,22 @@ public class Policy {
 
     public void setStatus(String status) {
         this.status = status;
+    }
+
+    // Convenience getters (aliases for test/API compatibility)
+    public String getPolicyHolderName() {
+        return customerName;
+    }
+
+    public BigDecimal getCoverageLimit() {
+        return sumInsured;
+    }
+
+    public LocalDate getExpirationDate() {
+        return endDate;
+    }
+
+    public String getInsuranceCompany() {
+        return carrierName;
     }
 }

@@ -235,9 +235,13 @@ public class ClaimServiceImpl implements ClaimService {
     @Override
     @Transactional
     public void clearAllClaimData() {
-        entityManager.createNativeQuery(
-                "TRUNCATE TABLE claim_rule_results, claim_jsons, claim_documents, discharge_details, hospital_bill_details, claims RESTART IDENTITY CASCADE"
-        ).executeUpdate();
+        entityManager.createNativeQuery("DELETE FROM claim_rule_results").executeUpdate();
+        entityManager.createNativeQuery("DELETE FROM claim_jsons").executeUpdate();
+        entityManager.createNativeQuery("DELETE FROM claim_documents").executeUpdate();
+        entityManager.createNativeQuery("DELETE FROM discharge_details").executeUpdate();
+        entityManager.createNativeQuery("DELETE FROM hospital_bill_details").executeUpdate();
+        entityManager.createNativeQuery("DELETE FROM claims").executeUpdate();
+        claimIdGeneratorService.clearGeneratedIds();
     }
 
     private ClaimResponseDto mapToResponseDto(Claim claim) {

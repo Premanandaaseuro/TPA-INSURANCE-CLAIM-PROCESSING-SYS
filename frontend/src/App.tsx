@@ -37,6 +37,17 @@ export const App: React.FC = () => {
     loadClaims();
   }, []);
 
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        setIsNewClaimModalOpen(false);
+        setIsClearModalOpen(false);
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, []);
+
   const handleSelectClaim = async (claimId: string) => {
     try {
       setIsLoading(true);
@@ -92,12 +103,13 @@ export const App: React.FC = () => {
       {/* Main Content Area */}
       <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {successMessage && (
-          <div className="mb-6 p-4 bg-emerald-50 border border-emerald-200 rounded-2xl text-emerald-800 text-xs flex items-center justify-between shadow-sm">
+          <div className="mb-6 p-4 bg-emerald-50 border border-emerald-200 rounded-2xl text-emerald-800 text-xs flex items-center justify-between shadow-sm" data-testid="success-banner">
             <div className="flex items-center gap-2.5">
               <CheckCircle2 className="w-5 h-5 text-emerald-600 shrink-0" />
-              <span className="font-semibold">{successMessage}</span>
+              <span className="font-semibold" data-testid="success-banner-message">{successMessage}</span>
             </div>
             <button
+              data-testid="dismiss-success-banner"
               onClick={() => setSuccessMessage(null)}
               className="text-emerald-700 hover:text-emerald-900 text-xs font-bold"
             >
@@ -107,13 +119,14 @@ export const App: React.FC = () => {
         )}
 
         {errorMessage && (
-          <div className="mb-6 p-4 bg-rose-50 border border-rose-200 rounded-2xl text-rose-800 text-xs flex items-start gap-3 shadow-sm">
+          <div className="mb-6 p-4 bg-rose-50 border border-rose-200 rounded-2xl text-rose-800 text-xs flex items-start gap-3 shadow-sm" data-testid="error-banner">
             <ShieldAlert className="w-5 h-5 text-rose-600 shrink-0 mt-0.5" />
             <div className="flex-1">
               <h4 className="font-bold text-slate-900">Backend Communication Warning</h4>
               <p className="mt-0.5">{errorMessage}</p>
             </div>
             <button
+              data-testid="retry-connection-button"
               onClick={loadClaims}
               className="px-3 py-1.5 bg-rose-600 text-white rounded-lg text-[11px] font-bold hover:bg-rose-700 transition-colors"
             >
@@ -142,7 +155,7 @@ export const App: React.FC = () => {
 
       {/* Clear Data Confirmation Modal */}
       {isClearModalOpen && (
-        <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4 z-50 animate-fade-in">
+        <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4 z-50 animate-fade-in" data-testid="clear-data-modal">
           <div className="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl border border-slate-100 space-y-4">
             <div className="w-12 h-12 rounded-full bg-rose-100 text-rose-600 flex items-center justify-center mx-auto">
               <Trash2 className="w-6 h-6" />
@@ -167,6 +180,7 @@ export const App: React.FC = () => {
 
             <div className="flex items-center gap-3 pt-2">
               <button
+                data-testid="cancel-clear-data-button"
                 type="button"
                 onClick={() => setIsClearModalOpen(false)}
                 disabled={isClearing}
@@ -175,6 +189,7 @@ export const App: React.FC = () => {
                 Cancel
               </button>
               <button
+                data-testid="confirm-clear-data-button"
                 type="button"
                 onClick={handleConfirmClearData}
                 disabled={isClearing}

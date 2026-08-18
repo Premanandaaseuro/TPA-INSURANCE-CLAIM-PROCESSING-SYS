@@ -1,0 +1,12 @@
+{
+  "name": "tpa-insurance-claim-processing-system",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Automated Claims Processing System for TPA Insurance",
+  "scripts": {
+    "test:e2e": "cd TPA_Playwright_E2E && npx playwright test",
+    "test:e2e:report": "cd TPA_Playwright_E2E && npx playwright show-report reports/playwright-report",
+    "docker:down": "docker compose down --remove-orphans",
+    "docker:up": "docker compose up -d --build"
+  }
+}
